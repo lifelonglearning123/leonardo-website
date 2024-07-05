@@ -1316,7 +1316,7 @@ iframe {
 }
 
 .bg_image--2 {
-  background-image: url("{%static('images/bg/bg-image-2.jpg')%}");
+  background-image: url(../images/bg/bg-image-2.jpg);
 }
 
 .bg_image--3 {
@@ -1348,15 +1348,15 @@ iframe {
 }
 
 .bg_image--10 {
-  background-image: url(../images/bg/bg-image-10.jpg);
+  background-image: url(../images/bg/woodwork.jpg);
 }
 
 .bg_image--11 {
-  background-image: url(../images/bg/bg-image-11.jpg);
+  background-image: url(../images/bg/events.jpg);
 }
 
 .bg_image--12 {
-  background-image: url(../images/bg/bg-image-12.jpg);
+  background-image: url(../images/bg/about_us_front.jpg);
 }
 
 .bg_image--13 {
@@ -15725,6 +15725,7 @@ body.active-light-mode .service-wrapper > [class*=col]:nth-child(4) .service.ser
 }
 body.active-light-mode .logo a img.logo-light {
   display: none;
+  width: 15px;
 }
 body.active-light-mode .rainbow-back-top i {
   color: #333;

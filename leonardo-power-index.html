@@ -787,6 +787,77 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 .head .lead{--i:3}
 
 
+/* ── live demo callback ─────────────────────────────────── */
+.callback{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(22px,3vw,46px);
+  align-items:start;margin-top:clamp(30px,4vw,56px);
+  background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sheet);
+  padding:clamp(22px,3vw,42px)}
+.cb-head{grid-column:1/3;max-width:62ch}
+.cb-head h3{margin:6px 0 10px}
+.cb-head p{color:var(--fg-2);font-size:16.5px;line-height:1.55}
+.cb-head em{color:var(--accent);font-style:italic}
+.cb-form{display:grid;gap:14px}
+.cb-form .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cb-consent{display:flex;gap:11px;align-items:flex-start;font-size:14px;line-height:1.5;
+  color:var(--fg-2);cursor:pointer}
+.cb-consent input{margin-top:2px;width:17px;height:17px;flex:none;accent-color:var(--accent)}
+.cb-consent b{color:var(--fg);font-weight:600}
+.cb-code{display:grid;gap:14px}
+.cb-code-t{margin:0;color:var(--fg-2);font-size:15px;line-height:1.55}
+.cb-code-t b{color:var(--fg);font-weight:600}
+.cb-back{background:none;border:0;padding:0;justify-self:start;cursor:pointer;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:var(--fg-3)}
+.cb-back:hover{color:var(--fg-2)}
+.cb-done{display:grid;gap:8px}
+.cb-done-t{margin:0;font-family:var(--display);font-size:23px;font-weight:640;letter-spacing:-.025em}
+.cb-done p{margin:0;color:var(--fg-2);font-size:15.5px;line-height:1.55}
+.field .opt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--fg-3);margin-left:6px}
+/* a class-level display beats the UA [hidden] rule, so say it again */
+.cb-form[hidden],.cb-code[hidden],.cb-done[hidden]{display:none}
+.cb-ring{display:grid;place-items:center;gap:7px;width:100%;padding:28px 20px;border:0;
+  cursor:pointer;font-family:inherit;border-radius:var(--r-card);
+  background:var(--accent);color:var(--accent-ink);
+  transition:transform .4s var(--ease-swoop),box-shadow .4s,opacity .3s}
+.cb-ring .ico{width:30px;height:30px}
+.cb-ring .ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.cb-ring b{font-family:var(--display);font-size:27px;font-weight:640;letter-spacing:-.025em}
+.cb-ring .cb-sub{font-size:13.5px;opacity:.85}
+.cb-ring:hover{transform:translateY(-3px);box-shadow:0 24px 46px -18px rgb(var(--accent-rgb) / .75)}
+.cb-ring:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.cb-ring[disabled]{cursor:default;transform:none;opacity:.75}
+.callback.ringing .cb-ring .ico{animation:cb-shake .9s ease-in-out infinite}
+.cb-ring[disabled]{cursor:default;transform:none;opacity:.75}
+@keyframes cb-shake{0%,100%{transform:rotate(-11deg)}50%{transform:rotate(11deg)}}
+.cb-status{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;color:var(--fg-2);
+  text-align:center;margin:0;min-height:1em}
+.callback.called .cb-status{color:var(--live)}
+.cb-brief{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--r-card);
+  padding:clamp(18px,2vw,24px)}
+.cb-brief-t,.cb-brief .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--fg-3)}
+.cb-brief-t{margin:0 0 14px}
+.cb-brief ul{list-style:none;margin:0;padding:0}
+.cb-brief li{display:flex;gap:11px;align-items:flex-start;padding:11px 0;
+  border-top:1px dashed var(--line)}
+.cb-brief li:first-child{border-top:0}
+.cb-brief li i{position:relative;flex:none;width:16px;height:16px;border-radius:50%;
+  margin-top:3px;border:1.5px solid var(--line-2);transition:background .35s,border-color .35s}
+.cb-brief li.on i{background:var(--live);border-color:var(--live)}
+.cb-brief li.on i::after{content:"";position:absolute;left:4px;top:1.5px;width:4px;height:8px;
+  border:solid var(--bg);border-width:0 1.7px 1.7px 0;transform:rotate(42deg)}
+.cb-brief .k{display:block}
+.cb-brief .v{display:block;font-size:15px;color:var(--fg-2);margin-top:3px;line-height:1.45;
+  overflow-wrap:anywhere}
+.cb-brief li.on .v{color:var(--fg)}
+.cb-after{display:block;margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+@media (max-width:860px){
+  .callback{grid-template-columns:1fr}
+  .cb-head{grid-column:1}
+  .cb-form .two{grid-template-columns:1fr}
+}
+
 /* ── pricing ────────────────────────────────────────────── */
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);
   border-radius:var(--r-sheet);overflow:hidden;background:rgb(var(--bg2-rgb) / .35)}
@@ -1129,7 +1200,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <h2 id="demo-h" class="display h-lg fly" data-from="left">Try the front desk. <em>It's running now.</em></h2>
       <div>
         <p class="eyebrow fly" data-from="up">Live demo</p>
-        <p class="lead fly" data-from="up">Below: an estate agency page carrying the assistant every Leonardo Power site ships with — the one Chris Grean calls Zoe, two sections down. Beside it, the CRM record she fills in as the conversation happens. This loop is scripted so you can watch it; the real thing listens, speaks and books.</p>
+        <p class="lead fly" data-from="up">Below: an estate agency page carrying the assistant every Leonardo Power site ships with — the one Chris Grean calls Zoe, two sections down. Beside it, the CRM record she fills in as the conversation happens. This loop is scripted so you can watch it. Underneath is the real thing — our own front desk, which will ring you and talk about your business.</p>
       </div>
     </div>
 
@@ -1166,6 +1237,62 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         </div>
       </div>
       <div class="demo-foot"><span>Voice and text</span><span>Trained on your business</span><span>Saves to your CRM</span><span>Recognises callers</span><span>Hands over to a human when it should</span></div>
+    </div>
+
+    <div class="callback fly" data-from="up" data-cb>
+      <div class="cb-head">
+        <p class="eyebrow">Our front desk, not a recording</p>
+        <h3 id="cb-h" class="display h-sm">Let it ring you.</h3>
+        <p>Tell our receptionist three things about your business. It rings your mobile and talks about <em>your</em> trade — answering the question your customers actually ask, the way it would on your own site.</p>
+      </div>
+
+      <div class="cb-left">
+        <form class="cb-form" data-cb-form novalidate>
+          <div class="two">
+            <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" maxlength="80" required></div>
+            <div class="field"><label for="c-biz">Your business</label><input id="c-biz" name="business" type="text" autocomplete="organization" placeholder="Leeds Plumbing" maxlength="120" required></div>
+          </div>
+          <div class="field"><label for="c-about">What do customers ask you most?</label><input id="c-about" name="askedMost" type="text" placeholder="Do you do emergency call-outs?" maxlength="300" required></div>
+          <div class="field"><label for="c-miss">The call you hate missing <span class="opt">optional</span></label><input id="c-miss" name="hateMissing" type="text" placeholder="A new boiler quote, at 8pm" maxlength="300"></div>
+          <div class="two">
+            <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+            <div class="field"><label for="c-phone">Your mobile</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" placeholder="07…" maxlength="24" required></div>
+          </div>
+          <label class="cb-consent"><input type="checkbox" name="consent" required><span>Text me a code, then ring me on this number. <b>Once</b> — we won't call again.</span></label>
+          <button class="btn btn-ghost" type="submit" data-cb-submit>Text me a code <span class="arr">→</span></button>
+        </form>
+
+        <form class="cb-code" data-cb-code hidden novalidate>
+          <p class="cb-code-t">We've texted a code to <b data-cb-phone></b>. Type it in and your phone rings.</p>
+          <div class="field"><label for="c-otp">Your code</label><input id="c-otp" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="8" placeholder="123456" required></div>
+          <button class="cb-ring" type="submit" data-cb-ring>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.9 2z"/></svg></span>
+            <b>Ring me now</b>
+            <span class="cb-sub">Your phone lights up in about ten seconds</span>
+          </button>
+          <button class="cb-back" type="button" data-cb-back>← Wrong number? Start again</button>
+        </form>
+
+        <div class="cb-done" data-cb-done hidden>
+          <p class="cb-done-t">Answer it as yourself.</p>
+          <p>It already knows what your customers ask — let it show you how it would take that call. When you hang up, your own recording and transcript are on their way to you.</p>
+        </div>
+
+        <p class="cb-status" data-cb-status role="status"></p>
+        <p class="form-err" data-cb-error role="alert"></p>
+      </div>
+
+      <aside class="cb-brief" data-cb-brief>
+        <p class="cb-brief-t">What it will know when it rings</p>
+        <ul>
+          <li data-k="name"><i></i><div><span class="k">Your name</span><span class="v">—</span></div></li>
+          <li data-k="business"><i></i><div><span class="k">Your business</span><span class="v">—</span></div></li>
+          <li data-k="askedMost"><i></i><div><span class="k">What customers ask most</span><span class="v">—</span></div></li>
+          <li data-k="hateMissing"><i></i><div><span class="k">The call you hate missing</span><span class="v">—</span></div></li>
+          <li class="on"><i></i><div><span class="k">Everything we do</span><span class="v">Services, pricing, how we build</span></div></li>
+        </ul>
+        <p class="cb-after"><span class="k">After the call</span><span class="v" data-cb-after>Your recording, and a summary on your CRM record</span></p>
+      </aside>
     </div>
   </div>
 </section>
@@ -2120,6 +2247,123 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     buttons.forEach(b => b.addEventListener('click', () => { apply(b.dataset.setPalette, true); toast('Palette · ' + b.title); }));
   }
 
+  /* ────────────────────────────────────────────────────────
+     LIVE CALLBACK — the brief fills in as they type, Signal
+     texts a code to prove they own the number, then our own
+     receptionist rings them. Two hops, both to Signal:
+       POST {SIGNAL}/api/demo-call/start   -> { id }
+       POST {SIGNAL}/api/demo-call/verify  -> the phone rings
+     Signal owns the guardrails (one call per number per day,
+     per-visitor and daily caps, sociable hours) and writes the
+     lead into the CRM, which is what fires the text and the
+     WhatsApp. Nothing here holds a credential.
+     ──────────────────────────────────────────────────────── */
+  const SIGNAL_DEMO = 'https://signal.leonardopower.co.uk';
+
+  function initCallback(){
+    const root = $('[data-cb]'); if (!root) return;
+    const form   = $('[data-cb-form]', root);
+    const codeF  = $('[data-cb-code]', root);
+    const done   = $('[data-cb-done]', root);
+    const submit = $('[data-cb-submit]', root);
+    const ring   = $('[data-cb-ring]', root);
+    const back   = $('[data-cb-back]', root);
+    const status = $('[data-cb-status]', root);
+    const err    = $('[data-cb-error]', root);
+    const brief  = $('[data-cb-brief]', root);
+    const after  = $('[data-cb-after]', root);
+    const phoneO = $('[data-cb-phone]', root);
+    const FIELDS = { name: 'c-name', business: 'c-biz', askedMost: 'c-about', hateMissing: 'c-miss' };
+    let demoId = null;
+
+    /* Every keystroke shows the agent's brief growing. That anticipation
+       is the point — they should know what it knows before it rings. */
+    const paint = () => {
+      Object.keys(FIELDS).forEach(key => {
+        const li = $('[data-k="' + key + '"]', brief); if (!li) return;
+        const v = ($('#' + FIELDS[key]).value || '').trim();
+        $('.v', li).textContent = v || '—';
+        li.classList.toggle('on', !!v);
+      });
+    };
+    form.addEventListener('input', paint);
+    paint();
+
+    const show = (step) => {
+      form.hidden = step !== 'form';
+      codeF.hidden = step !== 'code';
+      done.hidden = step !== 'done';
+    };
+
+    const post = async (path, body) => {
+      const res = await fetch(SIGNAL_DEMO + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      let out = {}; try { out = await res.json(); } catch (_) {}
+      if (!res.ok) throw new Error(out.error || 'That did not work. Please ring us on +44 20 4572 2164.');
+      return out;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()){ form.reportValidity(); return; }
+      const label = submit.innerHTML;
+      submit.disabled = true; submit.textContent = 'Texting you a code…';
+      err.textContent = ''; status.textContent = '';
+      try {
+        const out = await post('/api/demo-call/start', {
+          name: $('#c-name').value.trim(),
+          email: $('#c-email').value.trim(),
+          phone: $('#c-phone').value.trim(),
+          business: $('#c-biz').value.trim(),
+          askedMost: $('#c-about').value.trim(),
+          hateMissing: $('#c-miss').value.trim()
+        });
+        demoId = out.id;
+        phoneO.textContent = $('#c-phone').value.trim();
+        show('code');
+        status.textContent = 'Code sent. It lands in a few seconds.';
+        $('#c-otp').focus({ preventScroll: true });
+      } catch (ex) {
+        err.textContent = (ex && ex.message) || 'That did not work.';
+      } finally {
+        submit.disabled = false; submit.innerHTML = label;
+      }
+    });
+
+    codeF.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!codeF.checkValidity()){ codeF.reportValidity(); return; }
+      ring.disabled = true; err.textContent = '';
+      root.classList.add('ringing');
+      status.textContent = 'Checking the code…';
+      try {
+        await post('/api/demo-call/verify', { id: demoId, code: $('#c-otp').value.trim() });
+        show('done');
+        root.classList.add('called');
+        status.textContent = 'Ringing you now — answer and say hello.';
+        after.textContent = 'On its way to you now';
+        toast('Calling ' + $('#c-phone').value.trim());
+      } catch (ex) {
+        root.classList.remove('ringing');
+        ring.disabled = false;
+        status.textContent = '';
+        err.textContent = (ex && ex.message) || 'That code did not work.';
+      }
+    });
+
+    back.addEventListener('click', () => {
+      demoId = null;
+      root.classList.remove('ringing');
+      ring.disabled = false;
+      err.textContent = ''; status.textContent = '';
+      show('form');
+      $('#c-phone').focus({ preventScroll: true });
+    });
+  }
+
   /* Service icons — replay the signature motion on hover or focus */
   function initIcons(){
     $$('.card, .pstep').forEach(card => {
@@ -2157,7 +2401,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      don't swap mid-word.
      ──────────────────────────────────────────────────────── */
   function boot(){
-    initReveals(); initFlow(); initParallax(); initNav(); initDemo(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initPalette();
+    initReveals(); initFlow(); initParallax(); initNav(); initDemo(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette();
   }
   let booted = false; const once = () => { if (!booted){ booted = true; boot(); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);

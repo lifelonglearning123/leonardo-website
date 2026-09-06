@@ -16,7 +16,7 @@
 const UPSERT_URL  = 'https://services.leadconnectorhq.com/contacts/upsert';
 const GHL_VERSION = '2021-07-28';
 
-const SOURCE  = 'leonardopower.co.uk — Start a project';
+const SOURCE  = 'leonardopower.com — Start a project';
 const COUNTRY = 'GB';
 const MAX_LEN = 5000;
 
@@ -147,7 +147,7 @@ module.exports = async (req, res) => {
     if (!result.ok) {
       /* Detail stays in the server log, never in the browser response. */
       console.error('[GHL] Upsert failed:', result.status, result.body);
-      return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.co.uk.' });
+      return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.com.' });
     }
 
     const contactId = result.body && result.body.contact && result.body.contact.id;
@@ -166,6 +166,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[GHL] Request error:', err);
-    return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.co.uk.' });
+    return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.com.' });
   }
 };

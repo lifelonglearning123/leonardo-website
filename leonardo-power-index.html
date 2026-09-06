@@ -25,7 +25,7 @@
   --bg-3:#070d1f;                         /* recessed: CRM, inputs, answer card */
   --line:#23305e; --line-2:#2f3f78;       /* hairlines */
   --fg:#f2eee4;   --fg-rgb:242 238 228;   /* primary text */
-  --fg-2:#98a4c9; --fg-3:#6c78a3;         /* secondary / tertiary text */
+  --fg-2:#98a4c9; --fg-3:#7a85ac;         /* secondary / tertiary text */
   --accent:#9fb5ff; --accent-rgb:159 181 255; --accent-ink:#0a1128;
   --inverse-bg:#f2eee4; --inverse-fg:#0a1128;   /* solid contrast surfaces: primary button, stickers, logo */
   --live:#57d9a3; --live-rgb:87 217 163;
@@ -53,7 +53,7 @@
   --bg-3:#eaeef8;
   --line:#dbe1f0; --line-2:#c3cce4;
   --fg:#0e3190;   --fg-rgb:14 49 144;
-  --fg-2:#46589c; --fg-3:#6b78ad;
+  --fg-2:#46589c; --fg-3:#5e6ca6;
   --accent:#2b5cf6; --accent-rgb:43 92 246; --accent-ink:#ffffff;
   --inverse-bg:#0e3190; --inverse-fg:#ffffff;
   --live:#159a62; --live-rgb:21 154 98;
@@ -67,7 +67,7 @@
   --bg-3:#070709;
   --line:#26262e; --line-2:#37373f;
   --fg:#f4f2ec;   --fg-rgb:244 242 236;
-  --fg-2:#a4a4ae; --fg-3:#70707b;
+  --fg-2:#a4a4ae; --fg-3:#7f7f8b;
   --accent:#e9c46a; --accent-rgb:233 196 106; --accent-ink:#141412;
   --inverse-bg:#f4f2ec; --inverse-fg:#0b0b0e;
   --live:#57d9a3; --live-rgb:87 217 163;
@@ -112,6 +112,12 @@ img,svg{display:block;max-width:100%}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 ::selection{background:var(--accent);color:var(--accent-ink)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--inverse-bg);color:var(--inverse-fg);
+  padding:12px 18px;border-radius:0 0 12px 0;font-weight:500;text-decoration:none}
+.skip:focus{left:0}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-err:empty{display:none}
+.form-err{color:var(--hot);font-size:14px;line-height:1.5;margin-top:-2px}
 
 /* ── type roles ─────────────────────────────────────────── */
 .display{
@@ -275,7 +281,7 @@ html.js .fly.in{opacity:1;transform:none}
 .site-nav span:first-of-type{margin-left:auto}
 .site-nav em{font-style:normal;background:var(--c1);color:#fff;font-size:2.4cqw;padding:1.3cqw 2.6cqw;border-radius:99cqw;font-weight:600}
 .site-hero{padding:6cqw 5cqw 3cqw;text-align:center}
-.site-hero h5{margin:0 auto 2.4cqw;font-family:var(--hf);font-weight:400;font-size:7.4cqw;line-height:1;letter-spacing:-.03em;max-width:80%;text-wrap:balance}
+.site-hero .mh{margin:0 auto 2.4cqw;font-family:var(--hf);font-weight:400;font-size:7.4cqw;line-height:1;letter-spacing:-.03em;max-width:80%;text-wrap:balance}
 .site-hero p{height:1.5cqw;border-radius:1cqw;background:color-mix(in srgb,var(--ink) 22%,transparent);margin:1.7cqw auto;width:62%}
 .site-hero p.short{width:44%}
 .site-hero .go{display:inline-block;width:24cqw;height:6cqw;border-radius:99cqw;background:var(--c1);margin-top:2cqw}
@@ -285,13 +291,13 @@ html.js .fly.in{opacity:1;transform:none}
 .site-cards i:nth-child(3){background:color-mix(in srgb,var(--ink) 16%,var(--sbg))}
 /* split variant — text left, image right */
 .site.v-split .site-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:4cqw;text-align:left;align-items:center;padding-top:5cqw}
-.site.v-split .site-hero h5{margin:0 0 2cqw;max-width:none;font-size:6.6cqw}
+.site.v-split .site-hero .mh{margin:0 0 2cqw;max-width:none;font-size:6.6cqw}
 .site.v-split .site-hero p{margin:1.6cqw 0;width:84%}
 .site.v-split .site-hero p.short{width:56%}
 .site.v-split .site-hero .pic{aspect-ratio:1;border-radius:3cqw;background:linear-gradient(145deg,color-mix(in srgb,var(--c1) 70%,var(--sbg)),var(--c1))}
 /* photo variant — full-bleed image hero with overlaid type */
 .site.v-photo .site-hero{position:relative;margin:2.6cqw 5cqw 0;border-radius:3cqw;padding:9cqw 5cqw 7cqw;color:#fff;text-align:left;background:linear-gradient(160deg,color-mix(in srgb,var(--c1) 80%,#000 10%),color-mix(in srgb,var(--c1) 45%,#000))}
-.site.v-photo .site-hero h5{margin:0 0 2cqw;max-width:75%;color:#fff}
+.site.v-photo .site-hero .mh{margin:0 0 2cqw;max-width:75%;color:#fff}
 .site.v-photo .site-hero p{background:rgba(255,255,255,.45);margin:1.6cqw 0}
 .site.v-photo .site-hero .go{background:#fff}
 .site.v-photo .site-cards i{background:color-mix(in srgb,var(--ink) 10%,var(--sbg))}
@@ -307,18 +313,6 @@ html.js .fly.in{opacity:1;transform:none}
 .site-chat .voice i{width:.9cqw}
 .site .sample{position:absolute;left:4cqw;bottom:4cqw;font-family:var(--mono);font-size:2.4cqw;letter-spacing:.1em;text-transform:uppercase;background:rgba(13,19,38,.82);color:#fff;padding:1.4cqw 2.4cqw;border-radius:1.6cqw;opacity:.9}
 
-/* ── image slots — blank spots for photos ───────────────── */
-.slot{
-  position:relative;display:grid;place-items:center;text-align:center;
-  aspect-ratio:var(--ar,4/3);border-radius:var(--r-tile);padding:20px;
-  border:1px dashed rgb(var(--accent-rgb) / .45);
-  background:
-    repeating-linear-gradient(135deg,rgb(var(--accent-rgb) / .06) 0 12px,transparent 12px 24px),
-    rgb(var(--bg2-rgb) / .5);
-  color:var(--fg-2);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;line-height:1.6;
-}
-.slot b{display:block;color:var(--accent);font-weight:500;margin-bottom:6px}
-.slot.round{border-radius:50%;aspect-ratio:1}
 
 /* ── hero ───────────────────────────────────────────────── */
 .hero{position:relative;padding:clamp(140px,17vh,190px) 0 0}
@@ -328,6 +322,7 @@ html.js .fly.in{opacity:1;transform:none}
 .hero-copy .lead{margin:36px auto 0;max-width:54ch;text-align:center}
 .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:40px}
 .hero-copy .h-xl .cycle{color:var(--accent);font-style:italic;font-weight:560}
+.hero-badge{margin-top:28px;display:flex;justify-content:center}
 .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--fg-3);text-transform:uppercase}
 
 .tiles{position:absolute;inset:0;pointer-events:none;z-index:1}
@@ -344,9 +339,8 @@ html.js .fly.in{opacity:1;transform:none}
 .tile-par{will-change:transform;transition:transform .25s ease-out}
 .tile-bob{animation:bob var(--bd,7s) ease-in-out var(--bdl,0s) infinite alternate}
 @keyframes bob{from{transform:translateY(-7px) rotate(-.5deg)}to{transform:translateY(9px) rotate(.6deg)}}
-.tile .site{transition:transform .6s var(--ease-out),box-shadow .6s}
-.tile:hover .site{transform:scale(1.045) rotate(.5deg);box-shadow:0 60px 100px -30px rgb(var(--sh) / .95),0 0 0 1px rgb(var(--fg-rgb) / .18)}
-.tile .slot{aspect-ratio:3/4;font-size:10.5px}
+.tile .site,.tile .shot{transition:transform .6s var(--ease-out),box-shadow .6s}
+.tile:hover .site,.tile:hover .shot{transform:scale(1.045) rotate(.5deg);box-shadow:0 60px 100px -30px rgb(var(--sh) / .95),0 0 0 1px rgb(var(--fg-rgb) / .18)}
 /* stickers — small rotated labels that fly in */
 .sticker{
   display:inline-flex;align-items:center;gap:8px;
@@ -451,7 +445,7 @@ html.js .fly.in{opacity:1;transform:none}
 .chat-foot .mic svg{width:12px;height:12px}
 
 .crm{background:var(--bg-3);border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;position:relative;overflow:hidden;height:100%;display:flex;flex-direction:column}
-.demo-site .site .site-hero h5{font-size:6cqw}
+.demo-site .site .site-hero .mh{font-size:6cqw}
 .demo-site .site .site-hero{padding-top:5cqw}
 .crm-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .crm-head .t{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3)}
@@ -524,7 +518,7 @@ html.js .fly.in{opacity:1;transform:none}
 }
 .shot-bar{display:flex;align-items:center;gap:1.4cqw;height:7.6cqw;padding:0 3.4cqw;background:#e7eaef;border-bottom:1px solid rgb(0 0 0 / .07)}
 .shot-bar i{width:1.9cqw;height:1.9cqw;border-radius:50%;background:rgb(0 0 0 / .15)}
-.shot-bar span{margin:0 auto;font-family:var(--mono);font-size:2.5cqw;letter-spacing:.02em;color:rgb(0 0 0 / .52);white-space:nowrap;overflow:hidden}
+.shot-bar span{margin:0 auto;font-family:var(--mono);font-size:2.5cqw;letter-spacing:.02em;color:rgb(0 0 0 / .62);white-space:nowrap;overflow:hidden}
 .shot img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:top center;background:#fff}
 .shot .visit{
   position:absolute;right:3.4cqw;bottom:3.4cqw;
@@ -548,6 +542,33 @@ html.js .fly.in{opacity:1;transform:none}
 .card h3{margin:0 0 10px}
 .card p{color:var(--fg-2);font-size:16.5px;line-height:1.55}
 .card .foot{margin-top:18px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3)}
+
+/* ── the six service icons, each moving the way its service does ──
+   They run once as the card arrives and again on hover/focus (the
+   .go class is removed and re-added in JS to restart them). The
+   reduced-motion block below collapses every one to its end state. */
+.card .ico svg [class]{transform-box:view-box;transform-origin:center}
+.i-build .nib,.i-build .cap,.i-aeo .bubble,.i-memory .side,.i-care .beat{stroke-dasharray:1;stroke-dashoffset:0}
+@keyframes ico-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes ico-bar{0%,100%{transform:scaleY(.32)}50%{transform:scaleY(1)}}
+@keyframes ico-ring{0%{opacity:.15;transform:translateY(-2.5px)}55%,100%{opacity:1;transform:none}}
+@keyframes ico-scan{0%{transform:translate(-3.4px,2.2px) scale(.9)}45%{transform:translate(3px,-2px) scale(1.06)}100%{transform:none}}
+@keyframes ico-spark{0%{transform:scale(.15) rotate(-70deg);opacity:0}65%{transform:scale(1.18) rotate(10deg);opacity:1}100%{transform:none;opacity:1}}
+
+.card.in .i-build .nib,.ico.go .i-build .nib{animation:ico-draw .9s var(--ease-out) both}
+.card.in .i-build .cap,.ico.go .i-build .cap{animation:ico-draw .35s var(--ease-out) .7s both}
+.card.in .i-voice line,.ico.go .i-voice line{animation:ico-bar .62s ease-in-out 3}
+.card.in .i-voice line:nth-child(2),.ico.go .i-voice line:nth-child(2){animation-delay:.09s}
+.card.in .i-voice line:nth-child(3),.ico.go .i-voice line:nth-child(3){animation-delay:.18s}
+.card.in .i-voice line:nth-child(4),.ico.go .i-voice line:nth-child(4){animation-delay:.27s}
+.card.in .i-voice line:nth-child(5),.ico.go .i-voice line:nth-child(5){animation-delay:.36s}
+.card.in .i-memory .side,.ico.go .i-memory .side{animation:ico-draw .7s var(--ease-out) both}
+.card.in .i-memory .r1,.ico.go .i-memory .r1{animation:ico-ring .5s var(--ease-out) .1s both}
+.card.in .i-memory .r2,.ico.go .i-memory .r2{animation:ico-ring .5s var(--ease-out) .34s both}
+.card.in .i-seo .lens,.ico.go .i-seo .lens{animation:ico-scan 1.15s var(--ease-swoop) both}
+.card.in .i-aeo .bubble,.ico.go .i-aeo .bubble{animation:ico-draw .8s var(--ease-out) both}
+.card.in .i-aeo .spark,.ico.go .i-aeo .spark{animation:ico-spark .6s var(--ease-swoop) .55s both}
+.card.in .i-care .beat,.ico.go .i-care .beat{animation:ico-draw 1s var(--ease-out) both}
 @media (max-width:900px){.incl{grid-template-columns:1fr 1fr}}
 @media (max-width:600px){.incl{grid-template-columns:1fr}}
 
@@ -586,39 +607,74 @@ html.js .fly.in{opacity:1;transform:none}
 
 /* ── process ────────────────────────────────────────────── */
 .process{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;position:relative}
-.process::before{content:"";position:absolute;left:4%;right:4%;top:34px;border-top:1px dashed var(--line-2)}
-.pstep{position:relative;padding-top:74px}
-.pstep .n{position:absolute;top:8px;left:0;width:54px;height:54px;border-radius:50%;background:var(--bg);border:1px solid var(--line-2);display:grid;place-items:center;font-family:var(--display);font-style:italic;font-size:26px;color:var(--accent);font-weight:600}
+.process::before{content:"";position:absolute;left:4%;right:4%;top:37px;border-top:1px dashed var(--line-2);z-index:0}
+.pstep{position:relative;z-index:1;padding-top:74px}
+.pstep .n{position:absolute;top:8px;left:0;width:58px;height:58px;border-radius:50%;background:var(--bg);border:1px solid var(--line-2);display:grid;place-items:center;font-family:var(--display);font-style:italic;font-size:26px;color:var(--accent);font-weight:600}
 .pstep h3{margin:0 0 8px}
 .pstep p{color:var(--fg-2);font-size:15.5px;line-height:1.55}
 .pstep .dur{margin-top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3)}
-@media (max-width:900px){.process{grid-template-columns:1fr 1fr}.process::before{display:none}}
+@media (max-width:900px){.process{grid-template-columns:1fr 1fr}.process::before,.process::after{display:none}}
 @media (max-width:560px){.process{grid-template-columns:1fr}}
 
 /* ── studio ─────────────────────────────────────────────── */
 .studio{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(32px,5vw,80px);align-items:center}
-.studio-pics{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.studio-pics .slot:nth-child(2){margin-top:60px;--ar:3/4}
-.studio-pics .slot:nth-child(3){grid-column:1/3;width:60%;margin:-30px 0 0 20%;--ar:16/9}
+.studio-pic{border-radius:var(--r-sheet);overflow:hidden;
+  box-shadow:0 44px 90px -36px rgb(var(--sh) / .85),0 0 0 1px rgb(var(--fg-rgb) / .1)}
+.studio-pic img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;background:var(--bg-2)}
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,2.2vw,28px);margin-top:clamp(52px,6vw,90px)}
+.team figure{margin:0}
+.team img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;
+  border-radius:var(--r-card);background:var(--bg-2)}
+.team figcaption{margin-top:15px}
+.team b{display:block;font-family:var(--display);font-size:21px;font-weight:640;letter-spacing:-.025em}
+.team .role{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--fg-3);margin-top:6px}
+.team p{margin-top:10px;color:var(--fg-2);font-size:14px;line-height:1.55}
+@media (max-width:900px){.team{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.team{grid-template-columns:1fr;max-width:340px}}
 .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
 .facts div{border-top:1px solid var(--line);padding-top:12px}
 .facts b{display:block;font-family:var(--display);font-size:38px;letter-spacing:-.03em;font-weight:640;line-height:1}
 .facts span{display:block;color:var(--fg-2);font-size:13.5px;margin-top:6px}
 @media (max-width:820px){.studio{grid-template-columns:1fr}}
+@media (max-width:560px){.facts{grid-template-columns:1fr 1fr}}
 
 /* ── testimonials ───────────────────────────────────────── */
-.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
-.quote{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-card);padding:28px 26px;transform:rotate(var(--rot,0deg))}
-.quote:nth-child(2){margin-top:34px}
-.quote blockquote{margin:0 0 20px;font-family:var(--display);font-size:25px;line-height:1.2;letter-spacing:-.025em;font-weight:560}
-.quote blockquote em{color:var(--accent)}
-.quote .who{display:flex;align-items:center;gap:12px}
-.quote .who .slot{width:44px;flex:none;aspect-ratio:1;padding:0;font-size:8px;line-height:1.1;letter-spacing:0}
-.quote .who > div:not(.slot){flex:1;min-width:0}
-.quote .who b{display:block;font-weight:500;font-size:14.5px}
-.quote .who span{display:block;color:var(--fg-2);font-size:13px}
-.quote .sample-tag{margin-left:auto;flex:none;white-space:nowrap;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);border:1px dashed var(--line-2);padding:3px 7px;border-radius:6px}
-@media (max-width:900px){.quotes{grid-template-columns:1fr}.quote:nth-child(2){margin-top:0}}
+.vquotes{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(30px,3.6vw,52px) clamp(16px,2.4vw,30px);align-items:start}
+.vq1{grid-column:1/8}
+.vq2{grid-column:8/13;margin-top:58px}
+.vq3{grid-column:1/7;margin-top:6px}
+.vq4{grid-column:7/13;margin-top:-26px}
+.vquote{margin:0;transform:rotate(var(--rot,0deg));transition:transform .7s var(--ease-out)}
+.vquote:hover,.vquote:focus-within{transform:rotate(0)}
+.vquote blockquote{margin:0 0 20px;font-family:var(--display);font-weight:560;letter-spacing:-.03em;line-height:1.14;font-size:clamp(25px,2.9vw,37px);text-wrap:balance}
+.vq2 blockquote,.vq3 blockquote,.vq4 blockquote{font-size:clamp(22px,2.1vw,28px)}
+.player{position:relative;border-radius:var(--r-tile);overflow:hidden;background:#0a0a0c;
+  box-shadow:0 40px 80px -34px rgb(var(--sh) / .85),0 0 0 1px rgb(var(--fg-rgb) / .12)}
+.player video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0a0a0c}
+.play{position:absolute;inset:0;width:100%;padding:0;border:0;cursor:pointer;
+  display:grid;place-items:center;color:#fff;font:inherit;
+  background:radial-gradient(60% 60% at 50% 46%,rgb(0 0 0 / .34),rgb(0 0 0 / .06) 70%,transparent);
+  transition:background .35s}
+.play:hover{background:radial-gradient(64% 64% at 50% 46%,rgb(0 0 0 / .42),rgb(0 0 0 / .1) 72%,transparent)}
+.play .disc{width:clamp(52px,7cqw,68px);height:clamp(52px,7cqw,68px);border-radius:50%;
+  display:grid;place-items:center;background:rgb(255 255 255 / .24);border:1px solid rgb(255 255 255 / .62);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:transform .45s var(--ease-swoop),background .3s}
+.play .disc svg{width:21px;height:21px;fill:#fff;margin-left:3px}
+.play:hover .disc{transform:scale(1.09);background:rgb(255 255 255 / .3)}
+.play .len{position:absolute;right:11px;bottom:10px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  background:rgb(0 0 0 / .6);color:#fff;padding:4px 8px;border-radius:6px}
+.play:focus-visible{outline:2px solid var(--accent);outline-offset:-5px;border-radius:var(--r-tile)}
+.player.playing .play{display:none}
+.vquote figcaption{margin-top:15px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.vquote figcaption b{font-weight:500;font-size:15.5px}
+.vquote figcaption span{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--fg-3)}
+@media (max-width:900px){
+  .vquotes{grid-template-columns:1fr}
+  .vq1,.vq2,.vq3,.vq4{grid-column:1;margin-top:0}
+  .vq2 blockquote,.vq3 blockquote,.vq4 blockquote{font-size:clamp(22px,5.6vw,28px)}
+}
 
 /* ── faq ────────────────────────────────────────────────── */
 .faq{max-width:820px;margin:0 auto}
@@ -730,22 +786,73 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 .head .display{--i:1}
 .head .lead{--i:3}
 
-/* ── image band — photography placeholders after the hero ── */
-.band-wrap{padding-top:clamp(64px,8vw,120px)}
-.band{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(14px,2vw,28px);align-items:start}
-.band .slot{font-size:12.5px}
-.band .b1{grid-column:1/8;--ar:16/10}
-.band .b2{grid-column:8/13;--ar:4/5;margin-top:72px}
-.band .b3{grid-column:1/6;--ar:5/4;margin-top:-240px}
-.band .b4{grid-column:6/13;--ar:21/9}
-.band-cap{grid-column:1/13;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);margin-top:6px}
-@media (max-width:820px){
-  .band .b1,.band .b2,.band .b3,.band .b4{grid-column:1/13;margin-top:0}
-  .band .b2{--ar:16/10}.band .b3{--ar:16/10}
+
+/* ── pricing ────────────────────────────────────────────── */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);
+  border-radius:var(--r-sheet);overflow:hidden;background:rgb(var(--bg2-rgb) / .35)}
+.tier{position:relative;display:flex;flex-direction:column;padding:clamp(24px,2.8vw,38px);
+  border-left:1px solid var(--line)}
+.tier:first-child{border-left:0}
+.tier.feat{background:var(--bg-2);box-shadow:inset 0 0 0 1px rgb(var(--accent-rgb) / .3)}
+.tier .flag{align-self:flex-start;font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;background:var(--accent);color:var(--accent-ink);
+  padding:5px 10px;border-radius:99px;margin-bottom:16px}
+.tier .flag.ghost{background:none;color:var(--fg-3);border:1px solid var(--line-2)}
+.tier h3{margin:0}
+.tier .sub{margin-top:7px;color:var(--fg-2);font-size:15px;line-height:1.5}
+.tier .price{margin:22px 0 0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tier .price b{font-family:var(--display);font-weight:640;letter-spacing:-.035em;line-height:1;
+  font-size:clamp(36px,4vw,50px)}
+.tier .price span{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--fg-3)}
+.tier ul{list-style:none;margin:24px 0 0;padding:0;flex:1}
+.tier li{padding:12px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5;
+  color:var(--fg-2);display:grid;grid-template-columns:20px 1fr;gap:11px}
+.tier li svg{width:15px;height:15px;margin-top:4px;fill:none;stroke:var(--live);
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.tier li b{color:var(--fg);font-weight:500}
+.tier .btn{margin-top:26px;width:100%;justify-content:center}
+.tier .tier-note{margin-top:13px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  color:var(--fg-3);line-height:1.7}
+@media (max-width:900px){
+  .tiers{grid-template-columns:1fr}
+  .tier{border-left:0;border-top:1px solid var(--line)}
+  .tier:first-child{border-top:0}
 }
-.process-pic{margin-top:clamp(40px,5vw,72px)}
-.contact-pic{margin-top:30px}
-.studio-pics .slot{font-size:12.5px}
+
+/* ── process: an icon per step, and a line that draws across ────── */
+.pstep .n svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.pstep .n i{position:absolute;top:-3px;right:-3px;width:21px;height:21px;border-radius:50%;
+  background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-style:normal;
+  font-size:11px;font-weight:600;display:grid;place-items:center}
+.process::after{content:"";position:absolute;left:4%;right:4%;top:37px;z-index:0;
+  border-top:1px solid var(--accent);opacity:.5;transform:scaleX(0);transform-origin:left}
+.process:has(.pstep.in)::after{animation:proc-line 1.5s var(--ease-out) .15s both}
+@keyframes proc-line{to{transform:scaleX(1)}}
+
+.pstep .n svg [class]{transform-box:view-box;transform-origin:center}
+.p-listen .a1,.p-listen .a2,.p-listen .a3,.p-build .lyr{opacity:1}
+.p-design .fr,.p-design .ln,.p-care .base,.p-care .arw,.p-care .head{stroke-dasharray:1;stroke-dashoffset:0}
+@keyframes proc-arc{from{opacity:0;transform:translateX(-4px) scaleX(.6)}to{opacity:1;transform:none}}
+@keyframes proc-drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes proc-pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:none}}
+@keyframes proc-watch{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+
+.pstep.in .p-listen .a1,.n.go .p-listen .a1{animation:proc-arc .5s var(--ease-out) .05s both}
+.pstep.in .p-listen .a2,.n.go .p-listen .a2{animation:proc-arc .5s var(--ease-out) .2s both}
+.pstep.in .p-listen .a3,.n.go .p-listen .a3{animation:proc-arc .5s var(--ease-out) .35s both}
+.pstep.in .p-design .fr,.n.go .p-design .fr{animation:ico-draw .8s var(--ease-out) both}
+.pstep.in .p-design .ln,.n.go .p-design .ln{animation:ico-draw .45s var(--ease-out) .55s both}
+.pstep.in .p-design .cur,.n.go .p-design .cur{animation:proc-pop .45s var(--ease-swoop) .8s both}
+.pstep.in .p-build .l1,.n.go .p-build .l1{animation:proc-drop .45s var(--ease-swoop) .1s both}
+.pstep.in .p-build .l2,.n.go .p-build .l2{animation:proc-drop .45s var(--ease-swoop) .28s both}
+.pstep.in .p-build .l3,.n.go .p-build .l3{animation:proc-drop .45s var(--ease-swoop) .46s both}
+.pstep.in .p-care .base,.n.go .p-care .base{animation:ico-draw .4s var(--ease-out) both}
+.pstep.in .p-care .arw,.n.go .p-care .arw{animation:ico-draw .55s var(--ease-out) .3s both}
+.pstep.in .p-care .head,.n.go .p-care .head{animation:ico-draw .3s var(--ease-out) .8s both}
+.pstep.in .p-care .eye,.n.go .p-care .eye{animation:proc-watch 1.6s ease-in-out 1s 3}
+
 
 /* ── palette switcher ───────────────────────────────────── */
 .palette{
@@ -765,6 +872,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   transition:transform .35s var(--ease-swoop),border-color .3s;
 }
 .palette .sw::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--a)}
+.palette .sw::before{content:"";position:absolute;inset:-9px;border-radius:50%}
 .palette .sw:hover{transform:scale(1.14)}
 .palette .sw[aria-pressed="true"]{border-color:var(--fg);transform:scale(1.08)}
 @media (max-width:600px){.palette{left:12px;bottom:12px;padding:6px 8px}.palette .lbl{display:none}}
@@ -780,6 +888,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 </style>
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <header class="nav" role="banner">
@@ -792,6 +901,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <a href="#demo">Live demo</a>
     <a href="#work">Work</a>
     <a href="#included">What's included</a>
+    <a href="#pricing">Pricing</a>
     <a href="#process">Process</a>
     <a href="#faq">FAQ</a>
   </nav>
@@ -805,6 +915,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <a href="#demo" data-menu-close>Live demo</a>
     <a href="#work" data-menu-close>Work</a>
     <a href="#included" data-menu-close>What's included</a>
+    <a href="#pricing" data-menu-close>Pricing</a>
     <a href="#process" data-menu-close>Process</a>
     <a href="#faq" data-menu-close>FAQ</a>
     <a href="#contact" data-menu-close>Start a project</a>
@@ -819,6 +930,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <p class="eyebrow fly" data-from="up">A web design studio — with a twist</p>
       <h1 id="hero-h" class="display h-xl type" data-speed="46" data-delay="700" data-then="cycle">Your new website<br><span class="cycle" data-words='["answers the phone.","remembers who called.","books the job at 2am.","never clocks off."]'>answers the phone.</span></h1>
       <p class="lead fly" data-from="up" style="--i:20">We design and build websites for small businesses, then give them a <strong>voice</strong>, a <strong>memory</strong> and somewhere to keep every lead. Your site talks to customers around the clock, saves what they tell it — and when they ring you, you already know who they are.</p>
+      <p class="hero-badge fly" data-from="up" style="--i:23"><span class="sticker signal" style="--rot:-1.5deg">Website designed in 24 hours</span></p>
       <div class="hero-cta fly" data-from="up" style="--i:26">
         <button class="btn btn-primary" type="button" data-open-assist><span class="dot" aria-hidden="true"></span>Talk to our site</button>
         <a class="btn btn-ghost" href="#work">See the work <span class="arr">↓</span></a>
@@ -826,31 +938,23 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <p class="hero-note fly" data-from="up" style="--i:30">Design · Build · AI voice &amp; chat · CRM · SEO &amp; AEO · Care</p>
     </div>
 
-    <!-- Floating tiles: screenshots of client sites (CSS mock-ups until real ones arrive) -->
+    <!-- Floating tiles: real screenshots of sites we've built (see #work for the full set) -->
     <div class="tiles" aria-hidden="true">
 
       <div class="tile" style="--x:-4%;--y:2%;--w:300px;--r:-7deg;--d:.25s;--sx:-50vw;--sy:-25vh;--sr:-30deg;--bd:7.2s;--z:.9">
         <div class="tile-par"><div class="tile-bob">
-          <div class="site" style="--c1:#1f8a7a;--sbg:#eef8f5;--ink:#0b2a26">
-            <div class="site-bar"><i></i><i></i><i></i><span>harbourdental.co.uk</span></div>
-            <div class="site-nav"><b>Harbour Dental</b><span></span><span></span><span></span><em>Book</em></div>
-            <div class="site-hero"><h5>Gentle dentistry, same-day when it hurts</h5><p></p><p class="short"></p><span class="go"></span></div>
-            <div class="site-cards"><i></i><i></i><i></i></div>
-            <div class="site-chat"><span class="voice"><i></i><i></i><i></i><i></i></span>Need an appointment? I can book one now.</div>
-            <span class="sample">Sample</span>
+          <div class="shot">
+            <div class="shot-bar"><i></i><i></i><i></i><span>glassgardenrooms.net</span></div>
+            <img src="/work/tile/glassgardenrooms.webp" width="640" height="480" alt="" decoding="async">
           </div>
         </div></div>
       </div>
 
       <div class="tile" style="--x:82%;--y:0%;--w:290px;--r:6deg;--d:.4s;--sx:50vw;--sy:-25vh;--sr:26deg;--bd:8.4s;--bdl:-2s;--z:1.1">
         <div class="tile-par"><div class="tile-bob">
-          <div class="site v-split" style="--c1:#e0662a;--sbg:#fff4ec;--ink:#2a1a10;--hf:var(--body)">
-            <div class="site-bar"><i></i><i></i><i></i><span>oakfieldheating.co.uk</span></div>
-            <div class="site-nav"><b>Oakfield Heating</b><span></span><span></span><span></span><em>Call</em></div>
-            <div class="site-hero"><div class="txt"><h5>Boiler down? We're out within the hour.</h5><p></p><p class="short"></p><span class="go"></span></div><div class="pic"></div></div>
-            <div class="site-cards"><i></i><i></i><i></i></div>
-            <div class="site-chat"><span class="voice"><i></i><i></i><i></i><i></i></span>Emergency? Tell me your postcode.</div>
-            <span class="sample">Sample</span>
+          <div class="shot">
+            <div class="shot-bar"><i></i><i></i><i></i><span>jackintheboxtrainingltd.com</span></div>
+            <img src="/work/tile/jackinthebox.webp" width="640" height="480" alt="" decoding="async">
           </div>
         </div></div>
       </div>
@@ -864,57 +968,40 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <div class="mini-crm">
             <span class="k">Lead · new</span><br>
             <b>Sam Okafor</b><br>
-            Cracked tooth · Headingley<br>
-            Seen: /emergency, /fees<br>
-            <span class="pill">Booked Tue 9:10</span>
+            Three-bed semi · valuation<br>
+            Seen: /selling, /recent-sales<br>
+            <span class="pill">Booked Sat 10:30</span>
           </div>
         </div></div>
       </div>
 
       <div class="tile" style="--x:12%;--y:80%;--w:310px;--r:-4deg;--d:.55s;--sx:-20vw;--sy:60vh;--sr:-16deg;--bd:8.8s;--bdl:-4s;--z:1">
         <div class="tile-par"><div class="tile-bob">
-          <div class="site v-photo" style="--c1:#b8432b;--sbg:#f8ecd9;--ink:#3a1b12">
-            <div class="site-bar"><i></i><i></i><i></i><span>rosaskitchen.co.uk</span></div>
-            <div class="site-nav"><b>Rosa's Kitchen</b><span></span><span></span><span></span><em>Book a table</em></div>
-            <div class="site-hero"><h5>Sunday lunch, the slow way</h5><p></p><p class="short"></p><span class="go"></span></div>
-            <div class="site-cards"><i></i><i></i><i></i></div>
-            <div class="site-chat"><span class="voice"><i></i><i></i><i></i><i></i></span>Table for tonight? Ask me.</div>
-            <span class="sample">Sample</span>
+          <div class="shot">
+            <div class="shot-bar"><i></i><i></i><i></i><span>woodboroughkennels.co.uk</span></div>
+            <img src="/work/tile/woodboroughkennels.webp" width="640" height="480" alt="" decoding="async">
           </div>
         </div></div>
       </div>
 
       <div class="tile" style="--x:83%;--y:46%;--w:270px;--r:-5deg;--d:.8s;--sx:50vw;--sy:30vh;--sr:20deg;--bd:7.4s;--bdl:-2.5s;--z:.8">
         <div class="tile-par"><div class="tile-bob">
-          <div class="site" style="--c1:#c9457a;--sbg:#f6ecf1;--ink:#2b1a24">
-            <div class="site-bar"><i></i><i></i><i></i><span>bloomandbough.co.uk</span></div>
-            <div class="site-nav"><b>Bloom &amp; Bough</b><span></span><span></span><span></span><em>Order</em></div>
-            <div class="site-hero"><h5>Flowers for the day you'll remember</h5><p></p><p class="short"></p><span class="go"></span></div>
-            <div class="site-cards"><i></i><i></i><i></i></div>
-            <div class="site-chat"><span class="voice"><i></i><i></i><i></i><i></i></span>Same-day delivery? Yes — where to?</div>
-            <span class="sample">Sample</span>
+          <div class="shot">
+            <div class="shot-bar"><i></i><i></i><i></i><span>cr-assoc.net</span></div>
+            <img src="/work/tile/cr-assoc.webp" width="640" height="480" alt="" decoding="async">
           </div>
         </div></div>
       </div>
 
       <div class="tile" style="--x:57%;--y:84%;--w:280px;--r:5deg;--d:.65s;--sx:20vw;--sy:60vh;--sr:14deg;--bd:9s;--bdl:-5s;--z:1.05">
         <div class="tile-par"><div class="tile-bob">
-          <div class="site v-split" style="--c1:#1d3a2f;--sbg:#f1f3ee;--ink:#12201a;--hf:var(--body)">
-            <div class="site-bar"><i></i><i></i><i></i><span>northgateaccounts.co.uk</span></div>
-            <div class="site-nav"><b>Northgate</b><span></span><span></span><span></span><em>Talk to us</em></div>
-            <div class="site-hero"><div class="txt"><h5>Tax done properly, explained plainly</h5><p></p><p class="short"></p><span class="go"></span></div><div class="pic"></div></div>
-            <div class="site-cards"><i></i><i></i><i></i></div>
-            <div class="site-chat"><span class="voice"><i></i><i></i><i></i><i></i></span>Deadline looming? Let's talk.</div>
-            <span class="sample">Sample</span>
+          <div class="shot">
+            <div class="shot-bar"><i></i><i></i><i></i><span>apexconstruction.site</span></div>
+            <img src="/work/tile/apexconstruction.webp" width="640" height="480" alt="" decoding="async">
           </div>
         </div></div>
       </div>
 
-      <div class="tile" style="--x:93%;--y:22%;--w:160px;--r:8deg;--d:.95s;--sx:40vw;--sy:0vh;--sr:32deg;--bd:6.6s;--bdl:-1.5s;--z:1.3">
-        <div class="tile-par"><div class="tile-bob">
-          <div class="slot" style="--ar:3/4"><span><b>Image</b>Founder or team photo</span></div>
-        </div></div>
-      </div>
 
       <div class="tile m-hide" style="--x:78%;--y:90%;--w:auto;--r:5deg;--d:1.25s;--sx:30vw;--sy:20vh;--sr:18deg;--bd:6.4s;--bdl:-.5s;--z:1.35">
         <div class="tile-par"><div class="tile-bob"><span class="sticker signal" style="--rot:0deg">Remembers every visitor</span></div></div>
@@ -932,19 +1019,6 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <ul>
         <li>Answers questions at <em>2am</em></li><li>Books the appointment</li><li>Remembers returning visitors</li><li>Fills in your CRM</li><li>Knows <em>who's calling</em></li><li>Ranks on Google</li><li>Gets quoted by ChatGPT</li><li>Texts you when a hot lead lands</li><li>Never puts anyone on hold</li>
       </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════ IMAGE BAND ═══════════════ -->
-<section class="section band-wrap" aria-label="Pictures">
-  <div class="wrap">
-    <div class="band">
-      <div class="slot b1 fly" data-from="left"><span><b>Image</b>A client's shopfront, early morning</span></div>
-      <div class="slot b2 fly" data-from="right" style="--i:2"><span><b>Image</b>The assistant answering on a phone</span></div>
-      <div class="slot b3 fly" data-from="up" style="--i:3"><span><b>Image</b>Studio, mid-project</span></div>
-      <div class="slot b4 fly" data-from="up" style="--i:4"><span><b>Image</b>A client site on a laptop, in use</span></div>
-      <p class="band-cap fly" data-from="up" style="--i:5"><span>Real businesses, real phones ringing.</span><span>Photography slots — replace with your own.</span></p>
     </div>
   </div>
 </section>
@@ -969,8 +1043,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <div class="step">
         <div class="stepcard fly" data-from="left">
           <span class="time">23:41 · Someone lands on your site</span>
-          <h3 class="display h-sm">It's late. Their boiler's just died.</h3>
-          <p>Or a tooth's cracked, or they've finally decided to sort the accounts. Your competitors' sites are asleep. Yours says hello — and means it.</p>
+          <h3 class="display h-sm">It's late. Their power's just gone.</h3>
+          <p>Or the driveway's flooding, or they've finally decided to book the extension. Your competitors' sites are asleep. Yours says hello — and means it.</p>
         </div>
         <span class="node"></span>
         <div class="art fly" data-from="right" style="--i:2">
@@ -988,8 +1062,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <div class="art fly" data-from="left" style="--i:2">
           <div class="chat" style="position:static;width:100%;max-width:320px;transform:rotate(-2deg)">
             <div class="chat-log">
-              <div class="msg me">Do you do emergency call-outs in LS6?</div>
-              <div class="msg ai">We do — LS6 is inside our one-hour zone. Want me to get an engineer to you tonight, or first thing?</div>
+              <div class="msg me">Do you do emergency call-outs in Swindon?</div>
+              <div class="msg ai">We do — Swindon is inside our one-hour zone. Want me to get an electrician to you tonight, or first thing?</div>
             </div>
           </div>
         </div>
@@ -1006,9 +1080,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <div class="mini-crm" style="transform:rotate(2deg);max-width:280px">
             <span class="k">Lead · updated 23:47</span><br>
             <b>Priya Shah</b> · 07700 900456<br>
-            Asked: emergency call-out, LS6<br>
+            Asked: emergency call-out, Swindon<br>
             Seen: /emergency, /prices, /reviews<br>
-            <span class="pill">Engineer booked · 07:30</span>
+            <span class="pill">Electrician booked · 07:30</span>
           </div>
         </div>
       </div>
@@ -1024,7 +1098,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <div class="crm-call show" style="position:static;max-width:300px;transform:rotate(-2.5deg)">
             <span class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="#0a1128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.9 2z"/></svg></span>
             <b>Incoming · Priya Shah</b>
-            <span>Emergency call-out · LS6 · booked 07:30</span>
+            <span>Emergency call-out · Swindon · booked 07:30</span>
           </div>
         </div>
       </div>
@@ -1032,7 +1106,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <div class="step">
         <div class="stepcard fly" data-from="left">
           <span class="time">08:52 · You pick up already knowing</span>
-          <h3 class="display h-sm">"Morning Priya — is this about the boiler?"</h3>
+          <h3 class="display h-sm">"Morning Priya — is this about the power?"</h3>
           <p>That's the twist. Design is where we start; the part that answers, remembers and follows up is what you're really paying for.</p>
         </div>
         <span class="node"></span>
@@ -1055,7 +1129,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <h2 id="demo-h" class="display h-lg fly" data-from="left">Try the front desk. <em>It's running now.</em></h2>
       <div>
         <p class="eyebrow fly" data-from="up">Live demo</p>
-        <p class="lead fly" data-from="up">Below: a Harbour Dental page carrying the assistant every Leonardo Power site ships with. Beside it, the CRM record it fills in as the conversation happens. This loop is scripted so you can watch it — the real thing listens, speaks and books.</p>
+        <p class="lead fly" data-from="up">Below: an estate agency page carrying the assistant every Leonardo Power site ships with — the one Chris Grean calls Zoe, two sections down. Beside it, the CRM record she fills in as the conversation happens. This loop is scripted so you can watch it; the real thing listens, speaks and books.</p>
       </div>
     </div>
 
@@ -1063,13 +1137,13 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <div class="demo">
         <div class="demo-site">
           <div class="site" style="--c1:#1f8a7a;--sbg:#eef8f5;--ink:#0b2a26">
-            <div class="site-bar"><i></i><i></i><i></i><span>harbourdental.co.uk/emergency</span></div>
-            <div class="site-nav"><b>Harbour Dental</b><span></span><span></span><span></span><em>Book</em></div>
-            <div class="site-hero"><h5>Cracked, chipped or in pain? Same-day slots, every morning.</h5><p></p><p class="short"></p><span class="go"></span></div>
+            <div class="site-bar"><i></i><i></i><i></i><span></span></div>
+            <div class="site-nav"><b>Chris Grean</b><span></span><span></span><span></span><em>Book a valuation</em></div>
+            <div class="site-hero"><div class="mh">Thinking of selling? Find out what it’s really worth.</div><p></p><p class="short"></p><span class="go"></span></div>
             <div class="site-cards"><i></i><i></i><i></i></div>
           </div>
           <div class="chat" data-demo-chat aria-live="polite">
-            <div class="chat-head"><span class="voice" data-demo-voice><i></i><i></i><i></i><i></i><i></i></span>Harbour Dental assistant<small>voice on</small></div>
+            <div class="chat-head"><span class="voice" data-demo-voice><i></i><i></i><i></i><i></i><i></i></span>Zoe · Chris Grean’s assistant<small>voice on</small></div>
             <div class="chat-log" data-demo-log></div>
             <div class="chat-foot">Type, or tap the mic and just talk…<span class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
           </div>
@@ -1087,7 +1161,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <div class="crm-call" data-crm-call>
             <span class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="#0a1128" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.9 2z"/></svg></span>
             <b>Incoming call · Sam Okafor</b>
-            <span>Cracked tooth · booked Tue 9:10 · new patient</span>
+            <span>Three-bed semi · valuation booked Sat 10:30</span>
           </div>
         </div>
       </div>
@@ -1119,8 +1193,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </article></div>
 
       <div class="w2 fly" data-from="right"><article class="piece" style="--rot:1.8deg">
-        <a class="shot" href="https://apex-construction-red.vercel.app/" target="_blank" rel="noopener">
-          <div class="shot-bar"><i></i><i></i><i></i><span>apex-construction-red.vercel.app</span></div>
+        <a class="shot" href="https://www.apexconstruction.site/" target="_blank" rel="noopener">
+          <div class="shot-bar"><i></i><i></i><i></i><span>apexconstruction.site</span></div>
           <img src="/work/apexconstruction.webp" width="1200" height="900" loading="lazy" decoding="async" alt="Apex Construction homepage — a dark photographic hero with the headline &quot;Measured twice. Built once.&quot;">
           <span class="visit">Visit site ↗</span>
         </a>
@@ -1129,8 +1203,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </article></div>
 
       <div class="w3 fly" data-from="spin"><article class="piece" style="--rot:-2.2deg">
-        <a class="shot" href="https://woodboroughkennels.vercel.app/" target="_blank" rel="noopener">
-          <div class="shot-bar"><i></i><i></i><i></i><span>woodboroughkennels.vercel.app</span></div>
+        <a class="shot" href="https://www.woodboroughkennels.co.uk/" target="_blank" rel="noopener">
+          <div class="shot-bar"><i></i><i></i><i></i><span>woodboroughkennels.co.uk</span></div>
           <img src="/work/woodboroughkennels.webp" width="1200" height="900" loading="lazy" decoding="async" alt="Woodborough Gardens Kennels homepage — serif headline &quot;A heritage kennel in an 18th-century walled garden&quot; beside a photo of dogs on the lawn.">
           <span class="visit">Visit site ↗</span>
         </a>
@@ -1181,8 +1255,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </article></div>
 
       <div class="w8 fly" data-from="right"><article class="piece" style="--rot:1.4deg">
-        <a class="shot" href="https://jselectrical.vercel.app/" target="_blank" rel="noopener">
-          <div class="shot-bar"><i></i><i></i><i></i><span>jselectrical.vercel.app</span></div>
+        <a class="shot" href="https://www.jselectricalswindon.co.uk/" target="_blank" rel="noopener">
+          <div class="shot-bar"><i></i><i></i><i></i><span>jselectricalswindon.co.uk</span></div>
           <img src="/work/jselectrical.webp" width="1200" height="900" loading="lazy" decoding="async" alt="J's Electrical Ltd homepage — serif headline &quot;Wired with precision, finished with care.&quot;">
           <span class="visit">Visit site ↗</span>
         </a>
@@ -1191,8 +1265,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </article></div>
 
       <div class="w9 fly" data-from="left"><article class="piece" style="--rot:-1.7deg">
-        <a class="shot" href="https://stonebasepaving.vercel.app/" target="_blank" rel="noopener">
-          <div class="shot-bar"><i></i><i></i><i></i><span>stonebasepaving.vercel.app</span></div>
+        <a class="shot" href="https://www.stonebasepavingandlandscaping.co.uk/" target="_blank" rel="noopener">
+          <div class="shot-bar"><i></i><i></i><i></i><span>stonebasepavingandlandscaping.co.uk</span></div>
           <img src="/work/stonebasepaving.webp" width="1200" height="900" loading="lazy" decoding="async" alt="StoneBase Paving homepage — a driveway photograph behind the headline &quot;Transform your outdoor space.&quot;">
           <span class="visit">Visit site ↗</span>
         </a>
@@ -1201,8 +1275,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </article></div>
 
       <div class="w10 fly" data-from="right"><article class="piece" style="--rot:1.6deg">
-        <a class="shot" href="https://website-growtthai.vercel.app/" target="_blank" rel="noopener">
-          <div class="shot-bar"><i></i><i></i><i></i><span>website-growtthai.vercel.app</span></div>
+        <a class="shot" href="https://www.growtth.ai/" target="_blank" rel="noopener">
+          <div class="shot-bar"><i></i><i></i><i></i><span>growtth.ai</span></div>
           <img src="/work/growtthai.webp" width="1200" height="900" loading="lazy" decoding="async" alt="Growtth.ai homepage — the headline &quot;Fully booked, effortlessly&quot; beside a mock booking conversation.">
           <span class="visit">Visit site ↗</span>
         </a>
@@ -1236,41 +1310,107 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 
     <div class="incl">
       <article class="card fly" data-from="left" style="--i:0">
-        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16l-1 4z"/><path d="M13 6l3 3"/></svg></div>
+        <div class="ico"><svg class="i-build" viewBox="0 0 24 24" aria-hidden="true"><path class="nib" pathLength="1" d="M4 20l4-1L19 8l-3-3L5 16l-1 4z"/><path class="cap" pathLength="1" d="M13 6l3 3"/></svg></div>
         <h3 class="display h-sm">Design &amp; build</h3>
         <p>A site that looks like your business on its best day — fast, mobile-first, built to turn visitors into calls. You see the design inside a week; it's live in weeks, not months.</p>
         <div class="foot">Design → code · hosted · secured</div>
       </article>
       <article class="card fly" data-from="up" style="--i:1">
-        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></div>
+        <div class="ico"><svg class="i-voice" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="7" x2="8" y2="17"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="20" y1="11" x2="20" y2="13"/></svg></div>
         <h3 class="display h-sm">The voice</h3>
         <p>An AI receptionist that talks and types — trained on your services, prices and tone. It answers, qualifies, books, and hands over to a person the moment it should.</p>
         <div class="foot">Voice + chat · 24/7 · your accent</div>
       </article>
       <article class="card fly" data-from="right" style="--i:2">
-        <div class="ico"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div>
+        <div class="ico"><svg class="i-memory" viewBox="0 0 24 24" aria-hidden="true"><ellipse class="r1" cx="12" cy="6" rx="7" ry="3"/><path class="side" pathLength="1" d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path class="r2" d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div>
         <h3 class="display h-sm">The memory</h3>
         <p>A CRM built in from day one. Every visit, question and form lands in one record. When a customer calls, your phone shows the name and the story so far.</p>
         <div class="foot">CRM · caller recognition · notes</div>
       </article>
       <article class="card fly" data-from="left" style="--i:3">
-        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/></svg></div>
+        <div class="ico"><svg class="i-seo" viewBox="0 0 24 24" aria-hidden="true"><g class="lens"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/></g></svg></div>
         <h3 class="display h-sm">SEO</h3>
-        <p>Found on Google for the searches that actually bring work — "emergency plumber Harrogate", not vanity keywords. Local listings, speed, structure and content, done properly.</p>
+        <p>Found on Google for the searches that actually bring work — "emergency electrician Swindon", not vanity keywords. Local listings, speed, structure and content, done properly.</p>
         <div class="foot">Local · technical · content</div>
       </article>
       <article class="card fly" data-from="down" style="--i:4">
-        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 5h13a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-5 4V7a2 2 0 0 1 2-2z"/><path d="M13 8l.9 2.1 2.1.9-2.1.9L13 14l-.9-2.1L10 11l2.1-.9z"/></svg></div>
+        <div class="ico"><svg class="i-aeo" viewBox="0 0 24 24" aria-hidden="true"><path class="bubble" pathLength="1" d="M4 5h13a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-5 4V7a2 2 0 0 1 2-2z"/><path class="spark" d="M13 8l.9 2.1 2.1.9-2.1.9L13 14l-.9-2.1L10 11l2.1-.9z"/></svg></div>
         <h3 class="display h-sm">AEO</h3>
         <p>Answer Engine Optimisation. Your customers now ask ChatGPT, Perplexity and Google's AI who to call. We structure your site so the answer they get is you.</p>
         <div class="foot">Structured data · citations · FAQs</div>
       </article>
       <article class="card fly" data-from="right" style="--i:5">
-        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></div>
+        <div class="ico"><svg class="i-care" viewBox="0 0 24 24" aria-hidden="true"><path class="beat" pathLength="1" d="M3 12h4l2-5 4 10 2-5h6"/></svg></div>
         <h3 class="display h-sm">Watch &amp; care</h3>
         <p>We monitor uptime, conversations and leads around the clock, keep everything patched and current, and send you a plain-English monthly report.</p>
         <div class="foot">Monitoring · updates · monthly report</div>
       </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PRICING ═══════════════ -->
+<section class="section" id="pricing" aria-labelledby="pricing-h">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="eyebrow fly" data-from="up">Pricing</p>
+        <h2 id="pricing-h" class="display h-lg fly" data-from="left">Three ways in. <em>All of them optimised for search.</em></h2>
+      </div>
+      <p class="lead fly" data-from="up">Every package is built from the information you give us, and every one is SEO optimised from the day it goes live. What changes is how much of the front desk comes with it.</p>
+    </div>
+
+    <div class="tiers fly" data-from="up">
+
+      <div class="tier">
+        <span class="flag ghost">Self-serve</span>
+        <h3 class="display h-sm">Starter</h3>
+        <p class="sub">A site, live and looking right.</p>
+        <p class="price"><b>£99</b><span>one-off</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>A website generated from your brief.</b> You give us the information; we build it.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Two rounds of changes.</b></span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>SEO optimised</b> from the information you provide.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>A year's hosting</b> included.</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact">Start a project</a>
+        <p class="tier-note">£50 a year to keep it hosted after the first year.</p>
+      </div>
+
+      <div class="tier feat">
+        <span class="flag">Most popular</span>
+        <h3 class="display h-sm">Front desk</h3>
+        <p class="sub">The site, plus the voice and the memory.</p>
+        <p class="price"><b>£99</b><span>per month</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Website design</b> built around the information you give us.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Five rounds of changes.</b></span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>A 30-minute onboarding call.</b></span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>AI voice.</b> The site answers — out loud and by chat.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>The CRM.</b> Every conversation saved against the caller.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>SEO optimised</b> from day one.</span></li>
+        </ul>
+        <a class="btn btn-primary" href="#contact">Start a project</a>
+        <p class="tier-note">No setup fee. Monthly, so you can stop if it isn't earning.</p>
+      </div>
+
+      <div class="tier">
+        <span class="flag ghost">Built with you</span>
+        <h3 class="display h-sm">Bespoke</h3>
+        <p class="sub">Designed alongside you, and it keeps learning.</p>
+        <p class="price"><b>£1,000</b><span>setup, then £100 / month</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Everything in Front desk</b>, and then:</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Our developers design it with you.</b> Drawn, not generated.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Moving parts.</b> Animation and interaction, not a template.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Retargeting set up.</b> Forms and campaigns that bring people back.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Ten email templates</b>, written for your business.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Your AI brain, trained continuously.</b> We keep improving it with you.</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact">Book a call</a>
+        <p class="tier-note">For businesses that want the site to do the selling.</p>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1290,9 +1430,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         </div>
       </div>
       <div class="answer fly" data-from="right">
-        <div class="q"><i></i><span class="type" data-speed="24">Is there an emergency dentist in Leeds open on Saturdays?</span></div>
-        <div class="a type" data-type="word" data-speed="55" data-delay="1500">Yes — <b>Harbour Dental</b> in Headingley <span class="cite">harbourdental.co.uk</span> keeps same-day emergency slots every morning and opens Saturdays 9–1. They take new patients, and you can book on their site, by phone, or by asking their assistant.</div>
-        <div class="src"><span class="me">harbourdental.co.uk</span><span>google.com/maps</span><span>nhs.uk</span><span>trustpilot.com</span></div>
+        <div class="q"><i></i><span class="type" data-speed="24">Who&#8217;s a NICEIC-approved electrician near Swindon?</span></div>
+        <div class="a type" data-type="word" data-speed="55" data-delay="1500">Yes — <b>J’s Electrical Ltd</b> in Swindon <span class="cite">jselectricalswindon.co.uk</span> is NICEIC approved and has been trading since 2007, covering domestic, commercial and renewable work across Wiltshire. You can request a quote or book a callout on their site.</div>
+        <div class="src"><span class="me">jselectricalswindon.co.uk</span><span>google.com/maps</span><span>niceic.com</span><span>checkatrade.com</span></div>
       </div>
     </div>
   </div>
@@ -1339,19 +1479,18 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 <section class="section" id="process" aria-labelledby="proc-h">
   <div class="wrap">
     <div class="head right">
-      <h2 id="proc-h" class="display h-lg fly" data-from="left">From first call to live <em>in a few weeks.</em></h2>
+      <h2 id="proc-h" class="display h-lg fly" data-from="left">From first call to live <em>in a few days.</em></h2>
       <div>
         <p class="eyebrow fly" data-from="up">How we work</p>
         <p class="lead fly" data-from="up">Four steps, in order, with you at every one. No mysterious "development phase" where you don't hear from us.</p>
       </div>
     </div>
     <div class="process">
-      <div class="pstep fly" data-from="up" style="--i:0"><span class="n">1</span><h3 class="display h-sm">Listen</h3><p>A 30-minute call. We learn how your phone rings — who calls, what they ask, what a good week looks like.</p><div class="dur">Week 1</div></div>
-      <div class="pstep fly" data-from="up" style="--i:1"><span class="n">2</span><h3 class="display h-sm">Design</h3><p>You see the homepage design inside a week. We refine it together until it looks like your business on its best day.</p><div class="dur">Weeks 1–2</div></div>
-      <div class="pstep fly" data-from="up" style="--i:2"><span class="n">3</span><h3 class="display h-sm">Build &amp; train</h3><p>We build the site, train the voice on your services and tone, wire up the CRM, and lay the SEO and AEO foundations.</p><div class="dur">Weeks 2–5</div></div>
-      <div class="pstep fly" data-from="up" style="--i:3"><span class="n">4</span><h3 class="display h-sm">Launch &amp; care</h3><p>We go live, watch it closely for the first month, then keep it running, updated and reported on — every month.</p><div class="dur">Live + ongoing</div></div>
+      <div class="pstep fly" data-from="up" style="--i:0"><span class="n"><svg class="p-listen" viewBox="0 0 24 24" aria-hidden="true"><circle class="dot" cx="5" cy="12" r="1.7"/><path class="a1" d="M10 8.6a5 5 0 0 1 0 6.8"/><path class="a2" d="M14 5.4a9.6 9.6 0 0 1 0 13.2"/><path class="a3" d="M18 2.4a14.2 14.2 0 0 1 0 19.2"/></svg><i>1</i></span><h3 class="display h-sm">Listen</h3><p>A 30-minute call. We learn how your phone rings — who calls, what they ask, what a good week looks like.</p><div class="dur">Day 1</div></div>
+      <div class="pstep fly" data-from="up" style="--i:1"><span class="n"><svg class="p-design" viewBox="0 0 24 24" aria-hidden="true"><path class="fr" pathLength="1" d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path class="ln" pathLength="1" d="M6.5 8.5h7M6.5 11.5h4.5"/><path class="cur" d="M14 11.5l6.5 2.6-2.7 1-1 2.7z"/></svg><i>2</i></span><h3 class="display h-sm">Design</h3><p>You see the homepage design the next day. We refine it together until it looks like your business on its best day.</p><div class="dur">Days 1–2</div></div>
+      <div class="pstep fly" data-from="up" style="--i:2"><span class="n"><svg class="p-build" viewBox="0 0 24 24" aria-hidden="true"><path class="lyr l1" d="M12 2.6l9 4.7-9 4.7-9-4.7z"/><path class="lyr l2" d="M3 12.1l9 4.7 9-4.7"/><path class="lyr l3" d="M3 16.5l9 4.7 9-4.7"/></svg><i>3</i></span><h3 class="display h-sm">Build &amp; train</h3><p>We build the site, train the voice on your services and tone, wire up the CRM, and lay the SEO and AEO foundations.</p><div class="dur">Days 2–5</div></div>
+      <div class="pstep fly" data-from="up" style="--i:3"><span class="n"><svg class="p-care" viewBox="0 0 24 24" aria-hidden="true"><path class="base" pathLength="1" d="M3.5 20.5h17"/><path class="arw" pathLength="1" d="M11 17V6"/><path class="head" pathLength="1" d="M7 10l4-4 4 4"/><circle class="eye" cx="18.5" cy="6.5" r="2.1"/></svg><i>4</i></span><h3 class="display h-sm">Launch &amp; care</h3><p>We go live, watch it closely for the first month, then keep it running, updated and reported on — every month.</p><div class="dur">Live + ongoing</div></div>
     </div>
-    <div class="slot process-pic fly" data-from="up" style="--ar:21/8"><span><b>Image</b>Design review with a client — wide, cinematic</span></div>
   </div>
 </section>
 
@@ -1362,18 +1501,43 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <div>
         <p class="eyebrow fly" data-from="up">The studio</p>
         <h2 id="studio-h" class="display h-lg fly" data-from="left">Small studio. <em>Big infrastructure.</em></h2>
-        <p class="lead fly" data-from="up" style="margin-top:26px">[Your story goes here.] Leonardo Power is a small team of designers and engineers who got tired of watching good businesses lose customers to a website that couldn't answer a simple question. So we build websites that can — and stay to keep them sharp.</p>
+        <p class="lead fly" data-from="up" style="margin-top:26px">We've been building AI voice for four years — early enough to have made every mistake once, and long enough to know what holds up in front of a real customer at eleven at night.</p>
+        <p class="lead fly" data-from="up" style="margin-top:18px">In that time the same conversation kept happening. An owner hears "AI" and nods politely, because nobody has ever told them what it would actually do on a wet Tuesday afternoon. Ask the same person about their website and they're precise: what it cost, what it's for, and exactly what it isn't doing.</p>
+        <p class="lead fly" data-from="up" style="margin-top:18px">So we stopped selling AI and started building the thing it belongs inside. A site that looks like your business on its best day, ranks properly, and answers — typed or out loud — the moment someone asks. Every one of those conversations lands in a CRM you own, so you can follow up, retarget, and read back what people keep asking for, what they never ask about, and where the business should probably go next.</p>
+        <p class="lead fly" data-from="up" style="margin-top:18px">That's the infrastructure. We build bespoke apps and automations too — but this is the heart of it: a website, a voice and a memory, working as one thing instead of three suppliers.</p>
         <div class="facts">
-          <div class="fly" data-from="up" style="--i:0"><b>24/7</b><span>Your site's opening hours</span></div>
+          <div class="fly" data-from="up" style="--i:0"><b>4 yrs</b><span>Building AI voice, in production</span></div>
           <div class="fly" data-from="up" style="--i:1"><b>1 team</b><span>Design, voice, CRM and search</span></div>
-          <div class="fly" data-from="up" style="--i:2"><b>UK</b><span>Designed and supported here</span></div>
+          <div class="fly" data-from="up" style="--i:2"><b>UK</b><span>Dorking, Surrey — working nationwide</span></div>
         </div>
       </div>
-      <div class="studio-pics">
-        <div class="slot fly" data-from="left" style="--i:0"><span><b>Image</b>Team photo</span></div>
-        <div class="slot fly" data-from="right" style="--i:1"><span><b>Image</b>The studio</span></div>
-        <div class="slot fly" data-from="up" style="--i:2"><span><b>Image</b>You, mid-project</span></div>
+      <div class="studio-pic fly" data-from="right">
+        <img src="/media/team/team.webp" width="1000" height="1250" loading="lazy" decoding="async"
+             alt="The Leonardo Power team in the studio">
       </div>
+    </div>
+
+    <div class="team">
+      <figure class="fly" data-from="up" style="--i:0">
+        <img src="/media/team/bill.webp" width="560" height="700" loading="lazy" decoding="async" alt="Bill Mansfield">
+        <figcaption><b>Bill Mansfield</b><span class="role">Co-founder &amp; CEO</span>
+          <p>35 years in corporate sales and marketing, across more industries than he'd care to list.</p></figcaption>
+      </figure>
+      <figure class="fly" data-from="up" style="--i:1">
+        <img src="/media/team/chao.webp" width="560" height="700" loading="lazy" decoding="async" alt="Chao Liu">
+        <figcaption><b>Chao Liu</b><span class="role">Co-founder &amp; CTO</span>
+          <p>20 years in tech, built across banking and startups. Writes the thing that answers your phone.</p></figcaption>
+      </figure>
+      <figure class="fly" data-from="up" style="--i:2">
+        <img src="/media/team/cyrus.webp" width="560" height="700" loading="lazy" decoding="async" alt="Cyrus Njeru">
+        <figcaption><b>Cyrus Njeru</b><span class="role">Engineering</span>
+          <p>10 years across backend development, apps and data modelling — the plumbing under all of it.</p></figcaption>
+      </figure>
+      <figure class="fly" data-from="up" style="--i:3">
+        <img src="/media/team/soli.webp" width="560" height="700" loading="lazy" decoding="async" alt="Soli Shah">
+        <figcaption><b>Soli Shah</b><span class="role">Automation</span>
+          <p>5 years building the sales and marketing flows that run quietly behind the site.</p></figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -1381,24 +1545,65 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 <!-- ═══════════════ QUOTES ═══════════════ -->
 <section class="section" id="quotes" aria-labelledby="quotes-h">
   <div class="wrap">
-    <div class="head center">
+    <div class="head">
       <div>
         <p class="eyebrow fly" data-from="up">What owners say</p>
-        <h2 id="quotes-h" class="display h-lg fly" data-from="left">"I stopped asking <em>who's calling.</em>"</h2>
+        <h2 id="quotes-h" class="display h-lg fly" data-from="left">We asked them to describe it <em>in three words.</em></h2>
       </div>
+      <p class="lead fly" data-from="up">These are the raw interviews — owners talking about the voice that answers their phone. Subtitles and all. Play any of them.</p>
     </div>
-    <div class="quotes">
-      <figure class="quote fly" data-from="left" style="--rot:-1.5deg;--i:0">
-        <blockquote>It booked a root canal at ten past midnight. I found out <em>at breakfast.</em></blockquote>
-        <figcaption class="who"><div class="slot round"><span>Photo</span></div><div><b>[Owner name]</b><span>Harbour Dental</span></div><span class="sample-tag">Sample</span></figcaption>
+
+    <div class="vquotes">
+      <figure class="vq1 vquote fly" data-from="left" style="--rot:-1deg">
+        <blockquote>Calm. Responsive. Efficient.</blockquote>
+        <div class="player">
+          <video src="/media/chris-grean.mp4" poster="/media/chris-grean.webp" preload="none" playsinline
+                 controlslist="nodownload" width="640" height="360"></video>
+          <button class="play" type="button" aria-label="Play the interview with Chris Grean, estate agent — 26 seconds">
+            <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="len">0:26</span>
+          </button>
+        </div>
+        <figcaption><b>Chris Grean</b><span>Estate agent</span></figcaption>
       </figure>
-      <figure class="quote fly" data-from="up" style="--rot:1deg;--i:1">
-        <blockquote>The phone rings and I already know it's the boiler in LS6. Customers think <em>we're psychic.</em></blockquote>
-        <figcaption class="who"><div class="slot round"><span>Photo</span></div><div><b>[Owner name]</b><span>Oakfield Plumbing &amp; Heating</span></div><span class="sample-tag">Sample</span></figcaption>
+
+      <figure class="vq2 vquote fly" data-from="right" style="--rot:1.4deg">
+        <blockquote>Fantastic service and quality.</blockquote>
+        <div class="player">
+          <video src="/media/mark-butcher.mp4" poster="/media/mark-butcher.webp" preload="none" playsinline
+                 controlslist="nodownload" width="640" height="360"></video>
+          <button class="play" type="button" aria-label="Play the interview with Mark, butcher — 22 seconds">
+            <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="len">0:22</span>
+          </button>
+        </div>
+        <figcaption><b>Mark</b><span>Butcher</span></figcaption>
       </figure>
-      <figure class="quote fly" data-from="right" style="--rot:-1deg;--i:2">
-        <blockquote>Half our new clients came from asking an AI who to use. <em>It named us.</em></blockquote>
-        <figcaption class="who"><div class="slot round"><span>Photo</span></div><div><b>[Owner name]</b><span>Northgate Accountants</span></div><span class="sample-tag">Sample</span></figcaption>
+
+      <figure class="vq3 vquote fly" data-from="left" style="--rot:1deg">
+        <blockquote>I asked my colleagues to call her. They were blown away.</blockquote>
+        <div class="player">
+          <video src="/media/helen-dean.mp4" poster="/media/helen-dean.webp" preload="none" playsinline
+                 controlslist="nodownload" width="640" height="360"></video>
+          <button class="play" type="button" aria-label="Play the interview with Helen Dean, consultant — 25 seconds">
+            <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="len">0:25</span>
+          </button>
+        </div>
+        <figcaption><b>Helen Dean</b><span>Consultant</span></figcaption>
+      </figure>
+
+      <figure class="vq4 vquote fly" data-from="right" style="--rot:-1.4deg">
+        <blockquote>Five leads called at once. It picked them all up.</blockquote>
+        <div class="player">
+          <video src="/media/concurrent-callers.mp4" poster="/media/concurrent-callers.webp" preload="none" playsinline
+                 controlslist="nodownload" width="640" height="360"></video>
+          <button class="play" type="button" aria-label="Play the interview about five callers at once — 18 seconds">
+            <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="len">0:18</span>
+          </button>
+        </div>
+        <figcaption><b>Client interview</b><span>On five callers at once</span></figcaption>
       </figure>
     </div>
   </div>
@@ -1437,10 +1642,11 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <a href="#" class="fly" data-from="left" style="--i:0" data-open-assist><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></span><div><b>Ask the assistant</b><span>Bottom-right corner — it can book a call for you</span></div></a>
           <a href="#booking" class="fly" data-from="left" style="--i:1"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><div><b>Book a 30-minute call</b><span>Pick a slot that suits you — [booking link]</span></div></a>
           <a href="mailto:hello@leonardopower.co.uk" class="fly" data-from="left" style="--i:2"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><div><b>hello@leonardopower.co.uk</b><span>We reply within one working day</span></div></a>
+          <a href="tel:+442045722164" class="fly" data-from="left" style="--i:3"><span class="ico"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.9 2z"/></svg></span><div><b>+44 20 4572 2164</b><span>Mon–Fri · and the assistant covers the rest</span></div></a>
         </div>
-        <div class="slot contact-pic fly" data-from="up" style="--ar:16/9;--i:3"><span><b>Image</b>The people who pick up the phone</span></div>
       </div>
       <form class="sheet form fly" data-from="right" data-form novalidate>
+        <div class="hp" aria-hidden="true"><label for="f-website">Website</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
         <div class="fields" style="display:grid;gap:14px">
           <div class="two">
             <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
@@ -1460,6 +1666,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           </div>
           <div class="field"><label for="f-msg">Tell us a bit about the business</label><textarea id="f-msg" name="message" placeholder="What do people ring you about? What do you wish the website did?"></textarea></div>
           <button class="btn btn-signal" type="submit">Send it <span class="arr">→</span></button>
+          <p class="form-err" data-form-error role="alert"></p>
           <p class="fine">We reply within one working day. Your details go straight into — you guessed it — our CRM, so whoever picks up already knows your name.</p>
         </div>
         <div class="thanks">
@@ -1480,9 +1687,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       <span class="word">Leonardo <em>Power</em></span>
     </a>
     <div class="links">
-      <a href="#how">The twist</a><a href="#demo">Live demo</a><a href="#work">Work</a><a href="#included">What's included</a><a href="#process">Process</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+      <a href="#how">The twist</a><a href="#demo">Live demo</a><a href="#work">Work</a><a href="#included">What's included</a><a href="#pricing">Pricing</a><a href="#process">Process</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
     </div>
-    <p class="fine"><b>Leonardo Power</b> · Web design with a front desk · [Town], UK · hello@leonardopower.co.uk · [Company number] · © 2026 Leonardo Power. Client sites shown are illustrative mock-ups until replaced with real screenshots.</p>
+    <p class="fine"><b>Leonardo Power</b> · Web design with a front desk · 97 Ashcombe Road, Dorking, England, RH4 1LW · <a href="tel:+442045722164">+44 20 4572 2164</a> · <a href="mailto:hello@leonardopower.co.uk">hello@leonardopower.co.uk</a><br>Leonardo Power is a trading name of Leonardo da Vinci Ltd, registered in England and Wales, company no. 15428163. © 2026.</p>
   </div>
 </footer>
 
@@ -1737,23 +1944,23 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       status.textContent = 'Live'; status.className = 'pill live'; call.classList.remove('show');
     };
     const script = [
-      { f: 'source', v: 'Google · "emergency dentist leeds"' },
-      { page: '/emergency' },
-      { me: "Hi — do you do emergency appointments? I've cracked a tooth." },
-      { ai: "Sorry to hear that — yes. We keep two emergency slots every morning. Are you an existing patient?" },
-      { f: 'asked', v: 'Emergency appointment · cracked tooth' },
-      { me: "No, first time. I'm in Headingley." },
-      { ai: "You're about ten minutes away. I can hold 9:10 tomorrow with Dr Patel. What's your name, and the best number for you?" },
-      { page: '/fees' },
-      { f: 'notes', v: 'New patient · Headingley · checked fees page while chatting' },
-      { me: "Sam Okafor — 07700 900123." },
+      { f: 'source', v: 'Google · "estate agents near me"' },
+      { page: '/selling' },
+      { me: "Hi — what would you charge to sell a three-bed semi?" },
+      { ai: "Happy to help. The fee depends on the house and how fast you want to move — Chris gives you a straight number at the valuation. Shall I book you one?" },
+      { f: 'asked', v: 'Selling fee · three-bed semi' },
+      { me: "Yes please. Any chance of a Saturday?" },
+      { ai: "Saturday's fine. Chris has 10:30 or 2:15 free this week. Which suits you better?" },
+      { page: '/recent-sales' },
+      { f: 'notes', v: 'Seller · read recent sales while we talked' },
+      { me: "10:30. Sam Okafor — 07700 900123." },
       { f: 'name', v: 'Sam Okafor' },
       { f: 'phone', v: '07700 900123' },
-      { ai: "Booked: Tuesday 9:10 with Dr Patel. I've texted you directions and what to do tonight. Anything else I can help with?" },
-      { f: 'next', v: 'Booked · Tue 9:10 · Dr Patel' },
+      { ai: "Booked: Saturday 10:30 with Chris. I've texted you the confirmation and what he'll want to see. Anything else?" },
+      { f: 'next', v: 'Valuation · Sat 10:30 · with Chris' },
       { status: 'Hot lead', cls: 'hot' },
-      { me: "No, that's brilliant. Thank you." },
-      { ai: "You're welcome, Sam. See you tomorrow — and if the pain gets worse tonight, ring us and I'll pick up." },
+      { me: "No, that's great. Thanks." },
+      { ai: "You're welcome, Sam. Chris will see you Saturday — and if anything changes, just ask me." },
       { pause: 1400 },
       { call: true },
       { pause: 5200 }
@@ -1795,7 +2002,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   const replies = {
     cost: { text: "Two numbers: a fixed price for the design and build, and a monthly care plan that covers the voice, the CRM, hosting, monitoring and the ongoing SEO and AEO work. We quote both after a 30-minute call — shall I book one?", chips: ['Book a call', 'How long does it take?', 'How does the voice work?'] },
     voice: { text: "You're talking to an example of it. On your site I'd be trained on your services, prices and tone — answering by voice or text, booking appointments, and saving every conversation to your CRM so you always know who's calling.", chips: ['What does it cost?', 'Can I see examples?', 'Book a call'] },
-    examples: { text: "Have a look at 'Sites we've built' — I've scrolled you there. Harbour Dental, Oakfield Heating and Rosa's Kitchen are good places to start; each has an assistant like me on the front.", chips: ['What does it cost?', 'How does the voice work?', 'Book a call'], go: '#work' },
+    examples: { text: "Have a look at 'Sites we've built' — I've scrolled you there. Glass Garden Rooms, Apex Construction and Jack in the Box Training are good places to start. Every one is live: click any of them and you'll land on the real site.", chips: ['What does it cost?', 'How does the voice work?', 'Book a call'], go: '#work' },
     time: { text: "You'd see the homepage design within a week. Most sites are live in four to six weeks, with the voice and CRM trained and connected.", chips: ['What does it cost?', 'Book a call'] },
     book: { text: "Let's do it. What's the best number to reach you on, and roughly when suits — mornings, afternoons, evenings?", chips: [], booking: true },
     data: { text: "Your customers' data lives in a CRM you own, hosted in the UK/EU, with a data-processing agreement in place. You can export everything whenever you like.", chips: ['What does it cost?', 'Book a call'] },
@@ -1868,12 +2075,33 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      ──────────────────────────────────────────────────────── */
   function initForm(){
     const form = $('[data-form]'); if (!form) return;
-    form.addEventListener('submit', (e) => {
+    const btn = $('button[type="submit"]', form);
+    const err = $('[data-form-error]', form);
+    const FALLBACK = ' You can also email hello@leonardopower.co.uk or ring +44 20 4572 2164.';
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!form.checkValidity()){ form.reportValidity(); return; }
-      form.classList.add('sent');
-      const name = $('#f-name').value.trim().split(' ')[0];
-      toast('Saved to CRM' + (name ? ' · ' + name : ''));
+
+      const label = btn.innerHTML;
+      btn.disabled = true; btn.textContent = 'Sending…'; err.textContent = '';
+
+      try {
+        const res = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+        });
+        let out = {}; try { out = await res.json(); } catch (_) {}
+        if (!res.ok) throw new Error(out.error || 'We could not save that.');
+
+        form.classList.add('sent');
+        const name = $('#f-name').value.trim().split(' ')[0];
+        toast('Saved to CRM' + (name ? ' · ' + name : ''));
+      } catch (ex) {
+        btn.disabled = false; btn.innerHTML = label;
+        err.textContent = (ex && ex.message ? ex.message : 'We could not save that.') + FALLBACK;
+      }
     });
   }
 
@@ -1892,6 +2120,32 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     buttons.forEach(b => b.addEventListener('click', () => { apply(b.dataset.setPalette, true); toast('Palette · ' + b.title); }));
   }
 
+  /* Service icons — replay the signature motion on hover or focus */
+  function initIcons(){
+    $$('.card, .pstep').forEach(card => {
+      const ico = $('.ico', card) || $('.n', card); if (!ico) return;
+      const replay = () => { ico.classList.remove('go'); void ico.offsetWidth; ico.classList.add('go'); };
+      card.addEventListener('mouseenter', replay);
+      card.addEventListener('focusin', replay);
+    });
+  }
+
+  /* Testimonial clips — click to play, one at a time, poster restored at the end */
+  function initVideos(){
+    const players = $$('.player');
+    players.forEach(p => {
+      const v = $('video', p), btn = $('.play', p);
+      if (!v || !btn) return;
+      btn.addEventListener('click', () => {
+        players.forEach(o => { const ov = $('video', o); if (ov && ov !== v){ ov.pause(); } });
+        p.classList.add('playing'); v.controls = true;
+        const go = v.play(); if (go && go.catch) go.catch(() => {});
+        v.focus({ preventScroll: true });
+      });
+      v.addEventListener('ended', () => { v.controls = false; p.classList.remove('playing'); v.load(); });
+    });
+  }
+
   /* FAQ — one open at a time */
   function initFaq(){
     const all = $$('.faq details');
@@ -1903,12 +2157,39 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      don't swap mid-word.
      ──────────────────────────────────────────────────────── */
   function boot(){
-    initReveals(); initFlow(); initParallax(); initNav(); initDemo(); initAssist(); initForm(); initFaq(); initPalette();
+    initReveals(); initFlow(); initParallax(); initNav(); initDemo(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initPalette();
   }
   let booted = false; const once = () => { if (!booted){ booted = true; boot(); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);
   setTimeout(once, 1400);
 })();
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Leonardo Power",
+  "legalName": "Leonardo da Vinci Ltd",
+  "description": "Leonardo Power designs and builds websites for small businesses, then gives them an AI voice, a CRM and the search groundwork so the site answers customers around the clock.",
+  "url": "https://leonardopower.co.uk/",
+  "email": "hello@leonardopower.co.uk",
+  "telephone": "+442045722164",
+  "foundingDate": "2024-01-19",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "97 Ashcombe Road",
+    "addressLocality": "Dorking",
+    "addressRegion": "Surrey",
+    "postalCode": "RH4 1LW",
+    "addressCountry": "GB"
+  },
+  "areaServed": { "@type": "Country", "name": "United Kingdom" },
+  "founder": [
+    { "@type": "Person", "name": "Bill Mansfield", "jobTitle": "Co-founder & CEO" },
+    { "@type": "Person", "name": "Chao Liu", "jobTitle": "Co-founder & CTO" }
+  ],
+  "identifier": { "@type": "PropertyValue", "name": "Company number", "value": "15428163" }
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/leonardo-power-index.html"
+    }
+  ]
+}

@@ -702,6 +702,7 @@ html.js .fly.in{opacity:1;transform:none}
 .form .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .field{display:grid;gap:6px}
 .field label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3)}
+.field .why{font-size:13px;line-height:1.45;color:var(--fg-3);margin-top:-2px}
 .field input,.field textarea,.field select{
   width:100%;background:var(--bg-3);border:1px solid var(--line);border-radius:12px;padding:13px 14px;
   color:var(--fg);font:inherit;font-size:15px;outline:none;transition:border-color .25s,box-shadow .25s;
@@ -1197,34 +1198,53 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 <section class="section" id="demo" aria-labelledby="demo-h">
   <div class="wrap">
     <div class="head right">
-      <h2 id="demo-h" class="display h-lg fly" data-from="left">Try the front desk. <em>It's running now.</em></h2>
+      <h2 id="demo-h" class="display h-lg fly" data-from="left">Your website already knows the answers. <em>Your phone has never been told.</em></h2>
       <div>
         <p class="eyebrow fly" data-from="up">Live demo</p>
-        <p class="lead fly" data-from="up">Not a recording, and not a demo of somebody else's business. This is our own front desk, and it will ring your mobile in about a minute to talk about <em>yours</em> — answering the question your customers ask you most. That is why it asks you three things first: it cannot talk about your trade until you tell it what your trade is.</p>
+        <p class="lead fly" data-from="up">Two halves of the same business that have never been introduced. Here is what happens when you connect them — and then our own front desk will ring your mobile and prove it.</p>
       </div>
+    </div>
+
+
+    <div class="incl">
+      <article class="card fly" data-from="left" style="--i:0">
+        <div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2 1a12 12 0 0 0 5 5l1-2 5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/><path d="M3 3l18 18"/></svg></div>
+        <h3 class="display h-sm">Your site answers. Your phone doesn&apos;t.</h3>
+        <p>Your website knows your prices, your services, your hours and what you don&apos;t take on. It answers those questions all day without you. Your phone knows none of it — it rings, and whoever is nearest picks up. Or nobody does.</p>
+        <div class="foot">The gap</div>
+      </article>
+      <article class="card fly" data-from="up" style="--i:1">
+        <div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg></div>
+        <h3 class="display h-sm">Connect the two.</h3>
+        <p>Wire the phone into the website and it inherits everything the site knows. The same answers, the same prices, the same booking calendar — at 9am, at 9pm, and on the fourth call while you are already on the other line.</p>
+        <div class="foot">The fix</div>
+      </article>
+      <article class="card fly" data-from="right" style="--i:2">
+        <div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7"/><path d="M9 16h7"/></svg></div>
+        <h3 class="display h-sm">Every call leaves a record.</h3>
+        <p>Who rang, what they wanted, what was agreed and what happens next — written into your CRM while the conversation is still going. Not a voicemail to listen back to and type up later.</p>
+        <div class="foot">What you keep</div>
+      </article>
     </div>
 
     <div class="callback fly" data-from="up" data-cb>
       <div class="cb-head">
         <p class="eyebrow">Our front desk, not a recording</p>
         <h3 id="cb-h" class="display h-sm">Let it ring you.</h3>
-        <p>Tell our receptionist three things about your business. It rings your mobile and talks about <em>your</em> trade — answering the question your customers actually ask, the way it would on your own site.</p>
+        <p>You don&apos;t have to take our word for it. Tell it three things about your business and it will ring your mobile in about a minute — and answer as if it were <em>yours</em>.</p>
       </div>
 
       <div class="cb-left">
         <form class="cb-form" data-cb-form novalidate>
+          <div class="field"><label for="c-biz">Your business</label><input id="c-biz" name="business" type="text" autocomplete="organization" placeholder="Ashford Physiotherapy" maxlength="120" required><span class="why">So it knows who it is answering for.</span></div>
+          <div class="field"><label for="c-about">What do customers ask you most?</label><input id="c-about" name="askedMost" type="text" placeholder="Do you have anything this week?" maxlength="300" required><span class="why">Give it the question you are tired of answering.</span></div>
           <div class="two">
             <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" maxlength="80" required></div>
-            <div class="field"><label for="c-biz">Your business</label><input id="c-biz" name="business" type="text" autocomplete="organization" placeholder="Leeds Plumbing" maxlength="120" required></div>
+            <div class="field"><label for="c-phone">Your mobile</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" placeholder="07…" maxlength="24" required><span class="why">So it can ring you. Once.</span></div>
           </div>
-          <div class="field"><label for="c-about">What do customers ask you most?</label><input id="c-about" name="askedMost" type="text" placeholder="Do you do emergency call-outs?" maxlength="300" required></div>
-          <div class="field"><label for="c-miss">The call you hate missing <span class="opt">optional</span></label><input id="c-miss" name="hateMissing" type="text" placeholder="A new boiler quote, at 8pm" maxlength="300"></div>
-          <div class="two">
-            <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label for="c-phone">Your mobile</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" placeholder="07…" maxlength="24" required></div>
-          </div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="254" required><span class="why">Where your recording, transcript and summary land.</span></div>
           <label class="cb-consent"><input type="checkbox" name="consent" required><span>Text me a code, then ring me on this number. <b>Once</b> — we won't call again.</span></label>
-          <button class="btn btn-ghost" type="submit" data-cb-submit>Text me a code <span class="arr">→</span></button>
+          <button class="btn btn-ghost" type="submit" data-cb-submit>Call me now <span class="arr">→</span></button>
         </form>
 
         <form class="cb-code" data-cb-code hidden novalidate>
@@ -1253,7 +1273,6 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <li data-k="name"><i></i><div><span class="k">Your name</span><span class="v">—</span></div></li>
           <li data-k="business"><i></i><div><span class="k">Your business</span><span class="v">—</span></div></li>
           <li data-k="askedMost"><i></i><div><span class="k">What customers ask most</span><span class="v">—</span></div></li>
-          <li data-k="hateMissing"><i></i><div><span class="k">The call you hate missing</span><span class="v">—</span></div></li>
           <li class="on"><i></i><div><span class="k">Everything we do</span><span class="v">Services, pricing, how we build</span></div></li>
         </ul>
         <p class="cb-after"><span class="k">After the call</span><span class="v" data-cb-after>Your recording, and a summary on your CRM record</span></p>
@@ -2238,7 +2257,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     const brief  = $('[data-cb-brief]', root);
     const after  = $('[data-cb-after]', root);
     const phoneO = $('[data-cb-phone]', root);
-    const FIELDS = { name: 'c-name', business: 'c-biz', askedMost: 'c-about', hateMissing: 'c-miss' };
+    const FIELDS = { name: 'c-name', business: 'c-biz', askedMost: 'c-about' };
     let demoId = null;
 
     /* Every keystroke shows the agent's brief growing. That anticipation
@@ -2283,8 +2302,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           email: $('#c-email').value.trim(),
           phone: $('#c-phone').value.trim(),
           business: $('#c-biz').value.trim(),
-          askedMost: $('#c-about').value.trim(),
-          hateMissing: $('#c-miss').value.trim()
+          askedMost: $('#c-about').value.trim()
         });
         demoId = out.id;
         phoneO.textContent = $('#c-phone').value.trim();

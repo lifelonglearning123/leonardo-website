@@ -1758,7 +1758,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           </div>
           <div class="two">
             <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
-            <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="f-phone">Phone</label><div class="phone-in"><span class="cc">+44</span><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="7700 900123" maxlength="20"></div></div>
           </div>
           <div class="field"><label for="f-need">What do you need?</label>
             <select id="f-need" name="need">
@@ -2153,10 +2153,13 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       btn.disabled = true; btn.textContent = 'Sending…'; err.textContent = '';
 
       try {
+        const payload = Object.fromEntries(new FormData(form).entries());
+        if (payload.phone) payload.phone = e164(payload.phone);
+
         const res = await fetch('/api/lead', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+          body: JSON.stringify(payload)
         });
         let out = {}; try { out = await res.json(); } catch (_) {}
         if (!res.ok) throw new Error(out.error || 'We could not save that.');

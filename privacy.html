@@ -234,10 +234,14 @@
           services and availability, and it is instructed to hand over to a human when it doesn't know. Nothing
           it says is legal, medical or financial advice, and it must not be used for emergencies —
           <strong>if it's an emergency, call 999</strong>.</p>
-        <p><strong>We build and run the voice, the transcription and the telephony ourselves.</strong> Your
-          calls are not handed to somebody else's AI service to be processed, and we do not use recordings or
-          transcripts to train AI models — ours or anyone else's. Calls reach the public telephone network
-          through a licensed carrier, which is the one part of the chain nobody can build themselves.</p>
+        <p><strong>We build and run the voice and the transcription ourselves.</strong> Your calls are not
+          sent to somebody else's AI service to be interpreted, and we do not use recordings or transcripts to
+          train AI models — ours or anyone else's.</p>
+        <p>What we buy is the ground it stands on. The system runs on <strong>Google Cloud</strong>, which is
+          also where recordings and transcripts are stored, and calls reach the public telephone network
+          through a licensed carrier. Both are our processors: they hold the data on our instructions, they
+          don't use it for their own purposes, and Google's cloud terms prohibit it being used to train
+          Google's models.</p>
       </section>
 
       <section id="processor">
@@ -287,6 +291,9 @@
               <tr><td><strong>Vercel Inc.</strong></td>
                   <td>Hosting and delivery of this website, and its server logs</td>
                   <td>United States, served from Europe</td></tr>
+              <tr><td><strong>Google Cloud</strong></td>
+                  <td>The servers that run the assistant, and where call recordings and transcripts are stored</td>
+                  <td>[Google Cloud region — to confirm]</td></tr>
               <tr><td><strong>Google</strong></td>
                   <td>Fonts on every page; analytics and advertising if you consent</td>
                   <td>United States</td></tr>
@@ -302,16 +309,17 @@
             </tbody>
           </table>
         </div>
-        <p><strong>The assistant itself is not on this list.</strong> We build and host the voice, the
-          transcription and the telephone platform ourselves, so your conversations are not passed to a
-          third-party AI service to be turned into text. That is deliberate, and it is unusual.</p>
+        <p><strong>The assistant is ours.</strong> We wrote the voice and the transcription rather than
+          reselling somebody else's, so your conversations are not passed to a third-party AI service to be
+          turned into text — they are processed by our own software, on infrastructure we rent and control.
+          That is deliberate, and it is unusual.</p>
         <p>We will also disclose information if the law requires it, and to a buyer if the business is ever
           sold — in which case you'd be told.</p>
         <div class="todo">
-          <p><b>Before this goes live:</b> name the carrier that carries your calls in the row above, and say
-            where the voice infrastructure is hosted if it isn't the UK. Naming a processor is better practice
-            than a category, and it is worth the sentence — “we built it, it doesn't leave us” is a stronger
-            claim than most agencies can make.</p>
+          <p><b>Before this goes live:</b> two cells above need filling. Name the carrier that carries your
+            calls, and replace “Google Cloud region” with the actual region you run in — <code>europe-west2</code>
+            is London, <code>europe-west1</code> is Belgium, anything beginning <code>us-</code> is the United
+            States and changes what <a href="#transfers">section 9</a> has to say.</p>
         </div>
       </section>
 
@@ -327,6 +335,10 @@
         </ul>
         <p>Ask us and we'll tell you which applies to a given supplier and send you a copy of the relevant
           terms.</p>
+        <p><strong>Call recordings and transcripts</strong> are stored in the Google Cloud region named in the
+          table above. Where that region is in the UK or the EU, that is where the data sits — though Google's
+          support and engineering staff elsewhere may need access to keep the service running, which its data
+          processing terms cover.</p>
       </section>
 
       <section id="keep">

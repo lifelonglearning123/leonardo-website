@@ -64,11 +64,16 @@ function buildPayload(data, locationId) {
     locationId,
     firstName,
     lastName,
-    email:   clean(data.email),
     source:  SOURCE,
     country: COUNTRY,
     tags:    ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : [])
   };
+
+  /* An empty string is not an absent field: GHL answers an empty email
+     with "email must be an email" and rejects the whole contact. The
+     assistant often has a number and nothing else, so leave it out. */
+  const email = clean(data.email);
+  if (email) payload.email = email;
 
   const business = clean(data.business);
   if (business) payload.companyName = business;

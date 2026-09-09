@@ -698,6 +698,29 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 .foot .legal a:hover{color:var(--fg-2)}
 .foot .fine b{color:var(--fg-2);font-weight:500}
 
+/* ── before the checkout: who are we building for? ───────── */
+.buy{position:fixed;inset:0;z-index:95;display:flex;align-items:safe center;justify-content:center;
+  padding:16px;overflow:auto;background:rgb(var(--bg-rgb) / .72);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.buy[hidden]{display:none}
+.buy-card{position:relative;width:min(460px,100%);background:var(--bg-2);color:var(--fg);
+  border:1px solid var(--line);border-radius:var(--r-sheet);padding:clamp(22px,3vw,32px);
+  box-shadow:0 40px 90px -30px rgb(var(--sh) / .8)}
+.buy-card .eyebrow{margin-bottom:14px}
+.buy-sub{margin:12px 0 22px;color:var(--fg-2);font-size:15.5px;line-height:1.55}
+.buy-tier{display:inline-flex;align-items:baseline;gap:8px;margin-top:4px;padding:7px 13px;border-radius:999px;
+  background:rgb(var(--accent-rgb) / .12);color:var(--accent);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+.buy-x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;display:grid;
+  place-items:center;font-size:22px;line-height:1;color:var(--fg-3)}
+.buy-x:hover{background:rgb(var(--fg-rgb) / .07);color:var(--fg)}
+.buy-form .btn{width:100%;justify-content:center;margin-top:6px}
+.buy-form .fine{font-size:12.5px;color:var(--fg-3);line-height:1.5}
+.buy-form .fine a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion:no-preference){
+  .buy-card{animation:buy-in .45s var(--ease-swoop) both}
+  @keyframes buy-in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+}
+
 /* ── floating assistant ─────────────────────────────────── */
 .assist{position:fixed;right:20px;bottom:20px;z-index:70;font-family:var(--body)}
 .assist-pill{
@@ -1824,6 +1847,34 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 </div>
 <div class="toast" data-toast role="status"><i></i><span data-toast-text>Saved to CRM</span></div>
 
+<!-- ═══════════════ BEFORE THE CHECKOUT ═══════════════
+     The checkout only asks for a name and an email, so the business
+     itself would never reach the CRM. We ask here, save the lead, and
+     hand the checkout the name and email so nothing is typed twice.
+     No JS? The button is still a plain link straight to the checkout. -->
+<div class="buy" data-buy-modal hidden>
+  <div class="buy-card" role="dialog" aria-modal="true" aria-labelledby="buy-h">
+    <button class="buy-x" type="button" data-buy-close aria-label="Close">&times;</button>
+    <p class="eyebrow">Almost there</p>
+    <h2 id="buy-h" class="display h-sm" tabindex="-1">Who are we building for?</h2>
+    <p class="buy-sub">Three quick things, then card details on the next screen — with your name and email
+      already filled in.<br><span class="buy-tier" data-buy-tier></span></p>
+    <form class="form buy-form" data-buy-form novalidate>
+      <div class="field"><label for="b-name">Your name</label><input id="b-name" name="name" type="text"
+        autocomplete="name" maxlength="80" required></div>
+      <div class="field"><label for="b-biz">Your business</label><input id="b-biz" name="business" type="text"
+        autocomplete="organization" maxlength="120" placeholder="Ashford Physiotherapy" required>
+        <span class="why">So the site and the assistant know who they're for.</span></div>
+      <div class="field"><label for="b-email">Email</label><input id="b-email" name="email" type="email"
+        autocomplete="email" maxlength="254" required></div>
+      <button class="btn btn-signal" type="submit" data-buy-go>Continue to payment <span class="arr">→</span></button>
+      <p class="form-err" data-buy-error role="alert"></p>
+      <p class="fine">We save this so we know who is buying before the money arrives, and so we can start.
+        <a href="/privacy">Privacy policy</a>.</p>
+    </form>
+  </div>
+</div>
+
 <!-- ═══════════════ PALETTE SWITCHER (review tool — remove before launch, or keep as an easter egg) ═══════════════ -->
 <div class="palette" data-palette-ui role="group" aria-label="Colour palette">
   <span class="lbl">Palette</span>
@@ -2326,6 +2377,95 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     });
   }
 
+  /* ────────────────────────────────────────────────────────
+     BEFORE THE CHECKOUT — the payment link only collects a name and
+     an email, so the business name would never reach the CRM. Ask for
+     it here, save the lead, then hand the checkout what it needs so
+     nothing is typed twice. The lead is saved even if they never pay.
+     ──────────────────────────────────────────────────────── */
+  const TIERS = {
+    starter:   'Starter · £99 + VAT setup, then £30 + VAT a month',
+    frontdesk: 'Front desk · £99 + VAT a month, no setup fee'
+  };
+
+  function initBuy(){
+    const modal = $('[data-buy-modal]'); if (!modal) return;
+    const form  = $('[data-buy-form]', modal);
+    const err   = $('[data-buy-error]', modal);
+    const go    = $('[data-buy-go]', modal);
+    const tierO = $('[data-buy-tier]', modal);
+    let checkout = '', tier = '', lastFocus = null;
+
+    const open = (url, key, trigger) => {
+      checkout = url; tier = key; lastFocus = trigger;
+      tierO.textContent = TIERS[key] || '';
+      err.textContent = '';
+      modal.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      setTimeout(() => $('#b-name').focus({ preventScroll: true }), 60);
+    };
+    const close = () => {
+      modal.hidden = true;
+      document.documentElement.style.overflow = '';
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    };
+
+    $$('[data-buy]').forEach(a => a.addEventListener('click', (e) => {
+      const url = a.getAttribute('href');
+      if (!url || url.charAt(0) === '#') return;      /* no link yet — leave it alone */
+      e.preventDefault();
+      open(url, a.dataset.buy, a);
+    }));
+    $('[data-buy-close]', modal).addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){ e.preventDefault(); return close(); }
+      if (e.key !== 'Tab') return;
+      const f = $$('button, input, a[href]', modal).filter(el => !el.disabled);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()){ form.reportValidity(); return; }
+
+      const name  = $('#b-name').value.trim();
+      const biz   = $('#b-biz').value.trim();
+      const email = $('#b-email').value.trim();
+      const parts = name.split(/\s+/);
+
+      go.disabled = true; go.textContent = 'One moment…'; err.textContent = '';
+
+      /* keepalive lets this finish even as the browser navigates away, and
+         the race means a slow CRM never costs us the sale. */
+      try {
+        await Promise.race([
+          fetch('/api/lead', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,
+            body: JSON.stringify({
+              name, business: biz, email,
+              need: tier === 'starter' ? 'Starter' : 'Front desk',
+              message: 'Went through to the checkout for ' + (TIERS[tier] || tier) + '.'
+            })
+          }),
+          wait(1800)
+        ]);
+      } catch (_) { /* never block a payment on our own CRM */ }
+
+      const q = new URLSearchParams({
+        firstName: parts[0] || '',
+        lastName: parts.slice(1).join(' '),
+        email: email
+      });
+      location.href = checkout + (checkout.indexOf('?') > -1 ? '&' : '?') + q.toString();
+    });
+  }
+
   /* Service icons — replay the signature motion on hover or focus */
   function initIcons(){
     $$('.card, .pstep').forEach(card => {
@@ -2363,7 +2503,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      don't swap mid-word.
      ──────────────────────────────────────────────────────── */
   function boot(){
-    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette();
+    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette(); initBuy();
   }
   let booted = false; const once = () => { if (!booted){ booted = true; boot(); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);

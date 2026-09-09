@@ -23,6 +23,8 @@ const MAX_LEN = 5000;
 /* What they picked in "What do you need?" becomes a tag, so the lead can
    be routed and reported on without anyone reading the note first. */
 const NEED_TAGS = {
+  'Starter':                                       'starter',
+  'Front desk':                                    'front-desk',
   'A new website with the voice and CRM built in': 'new-site',
   'Add the voice and CRM to my existing site':     'retrofit',
   'SEO and AEO — get found, get quoted':           'seo-aeo',

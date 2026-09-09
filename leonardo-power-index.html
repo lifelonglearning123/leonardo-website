@@ -670,6 +670,14 @@ html.js .hero-copy .fly{opacity:1;transform:none;animation:hero-in .9s var(--eas
 }
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgb(var(--accent-rgb) / .15)}
 .field textarea{min-height:110px;resize:vertical}
+/* +44 lives in the box so nobody has to know what E.164 is */
+.phone-in{display:flex;align-items:stretch;background:var(--bg-3);border:1px solid var(--field-line);
+  border-radius:12px;overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.phone-in:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgb(var(--accent-rgb) / .15)}
+.phone-in .cc{display:flex;align-items:center;flex:none;padding:0 13px;font-size:15px;color:var(--fg-2);
+  border-right:1px solid var(--field-line);background:rgb(var(--fg-rgb) / .04)}
+.phone-in input{flex:1;min-width:0;border:0;border-radius:0;background:none}
+.phone-in input:focus{box-shadow:none;border-color:transparent}
 .form .btn{justify-self:start;margin-top:6px}
 .form .fine{font-size:12.5px;color:var(--fg-3);line-height:1.5}
 .form.sent .fields{display:none}
@@ -1214,7 +1222,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <div class="field"><label for="c-about">What do customers ask you most?</label><input id="c-about" name="askedMost" type="text" placeholder="Do you have anything this week?" maxlength="300" required><span class="why">Give it the question you are tired of answering.</span></div>
           <div class="two">
             <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" maxlength="80" required></div>
-            <div class="field"><label for="c-phone">Your mobile</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" placeholder="07…" maxlength="24" required><span class="why">So it can ring you. Once.</span></div>
+            <div class="field"><label for="c-phone">Your mobile</label><div class="phone-in"><span class="cc">+44</span><input id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="7700 900123" maxlength="20" required></div><span class="why">So it can ring you. Once. Outside the UK, type the full number starting with +.</span></div>
           </div>
           <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="254" required><span class="why">Where your recording, transcript and summary land.</span></div>
           <label class="cb-consent"><input type="checkbox" name="consent" required><span>Text me a code, then ring me on this number. <b>Once</b> — we won't call again.</span></label>
@@ -2192,6 +2200,19 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      ──────────────────────────────────────────────────────── */
   const SIGNAL_DEMO = 'https://signal.leonardopower.com';
 
+  /* People type 07700 900123. The dialler needs +447700900123. Nobody
+     should have to know that, so we do it for them — and anyone abroad
+     can still type their own + and country code. */
+  function e164(raw){
+    const v = String(raw || '').replace(/[^\d+]/g, '');
+    if (!v) return '';
+    if (v.startsWith('+'))  return v;
+    if (v.startsWith('00')) return '+' + v.slice(2);
+    if (v.startsWith('44')) return '+' + v;
+    if (v.startsWith('0'))  return '+44' + v.slice(1);
+    return '+44' + v;
+  }
+
   function initCallback(){
     const root = $('[data-cb]'); if (!root) return;
     const form   = $('[data-cb-form]', root);
@@ -2241,6 +2262,13 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!form.checkValidity()){ form.reportValidity(); return; }
+      const phone = e164($('#c-phone').value);
+      if (!/^\+\d{10,15}$/.test(phone)){
+        err.textContent = "That number doesn't look right. A UK mobile is 7700 900123 after the +44.";
+        $('#c-phone').focus({ preventScroll: true });
+        return;
+      }
+
       const label = submit.innerHTML;
       submit.disabled = true; submit.textContent = 'Texting you a code…';
       err.textContent = ''; status.textContent = '';
@@ -2248,12 +2276,12 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         const out = await post('/api/demo-call/start', {
           name: $('#c-name').value.trim(),
           email: $('#c-email').value.trim(),
-          phone: $('#c-phone').value.trim(),
+          phone: phone,
           business: $('#c-biz').value.trim(),
           askedMost: $('#c-about').value.trim()
         });
         demoId = out.id;
-        phoneO.textContent = $('#c-phone').value.trim();
+        phoneO.textContent = phone;
         show('code');
         status.textContent = 'Code sent. It lands in a few seconds.';
         $('#c-otp').focus({ preventScroll: true });
@@ -2276,7 +2304,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         root.classList.add('called');
         status.textContent = 'Ringing you now — answer and say hello.';
         after.textContent = 'On its way to you now';
-        toast('Calling ' + $('#c-phone').value.trim());
+        toast('Calling ' + e164($('#c-phone').value));
       } catch (ex) {
         root.classList.remove('ringing');
         ring.disabled = false;

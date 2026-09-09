@@ -25,6 +25,8 @@ const MAX_LEN = 5000;
 const NEED_TAGS = {
   'Starter':                                       'starter',
   'Front desk':                                    'front-desk',
+  'Assistant - call requested':                    'assistant-callback',
+  'Assistant - question':                          'assistant-question',
   'A new website with the voice and CRM built in': 'new-site',
   'Add the voice and CRM to my existing site':     'retrofit',
   'SEO and AEO — get found, get quoted':           'seo-aeo',
@@ -137,10 +139,15 @@ module.exports = async (req, res) => {
      Answer 200 so the bot thinks it worked and moves on. */
   if (clean(data.website)) return res.status(200).json({ ok: true });
 
-  const name  = clean(data.name);
   const email = clean(data.email);
-  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return res.status(400).json({ error: 'Please give us your name and a valid email address.' });
+  const phone = normalisePhone(data.phone);
+  const hasEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+  const hasPhone = /^\+\d{10,15}$/.test(phone);
+
+  /* One way to reach them is enough. The website form asks for both and
+     enforces it in the browser; the assistant often has only a number. */
+  if (!hasEmail && !hasPhone) {
+    return res.status(400).json({ error: 'Please give us an email address or a phone number.' });
   }
 
   try {

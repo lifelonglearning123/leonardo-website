@@ -2109,7 +2109,26 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      FLOATING ASSISTANT — scripted front desk for this site
      ──────────────────────────────────────────────────────── */
   const assist = $('[data-assist]');
-  let assistOpen = false, greeted = false, teased = false, awaitingBooking = false;
+  let assistOpen = false, greeted = false, teased = false, awaitingBooking = false, pendingAsk = '';
+
+  /* Pull a usable email or UK number out of whatever they typed. */
+  const EMAIL_RE = /[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}/i;
+  const PHONE_RE = /\+?\d[\d\s().-]{8,}\d/;
+  function contactFrom(text){
+    const email = (text.match(EMAIL_RE) || [''])[0].trim();
+    const raw = (text.match(PHONE_RE) || [''])[0];
+    const phone = raw ? e164(raw) : '';
+    return { email: email, phone: /^\+\d{10,15}$/.test(phone) ? phone : '' };
+  }
+  async function saveLead(body){
+    try {
+      const res = await fetch('/api/lead', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      return res.ok;
+    } catch (_) { return false; }
+  }
   function setAssist(o){
     if (!assist) return;
     assistOpen = o; assist.classList.toggle('open', o);
@@ -2123,13 +2142,13 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     time: { text: "You'd see the homepage design within a week. Most sites are live in four to six weeks, with the voice and CRM trained and connected.", chips: ['What does it cost?', 'Book a call'] },
     book: { text: "Let's do it. What's the best number to reach you on, and roughly when suits — mornings, afternoons, evenings?", chips: [], booking: true },
     data: { text: "Your customers' data lives in a CRM you own, with a data-processing agreement from day one, and you can export the lot whenever you like. It runs on US infrastructure under the UK's approved transfer safeguards — the same footing as Google Workspace or Microsoft 365. If you have to keep data inside the UK or EU, say so early and we'll talk about what that changes.", chips: ['What does it cost?', 'Book a call'] },
-    fallback: { text: "Good question — I've noted it for the team and saved it to the CRM so nobody has to ask you twice. Want me to book a quick call so they can answer it properly?", chips: ['Book a call', 'What does it cost?', 'Can I see examples?'] }
+    fallback: { text: "That one is better answered by a person than by me. Leave me a number or an email and I'll pass on exactly what you asked — someone will come back to you properly.", chips: [], booking: true }
   };
   function route(text){
     const t = text.toLowerCase();
     if (/(cost|price|much|fee|budget|£)/.test(t)) return 'cost';
     if (/(voice|talk|speak|sound|robot|phone)/.test(t)) return 'voice';
-    if (/(example|work|built|portfolio|see)/.test(t)) return 'examples';
+    if (/(example|portfolio|case stud|your work|the work|sites you|you built|show me)/.test(t)) return 'examples';
     if (/(long|time|when|weeks|fast|quick)/.test(t)) return 'time';
     if (/(book|call|meeting|chat with|speak to someone|human)/.test(t)) return 'book';
     if (/(data|gdpr|privacy|secure|store)/.test(t)) return 'data';
@@ -2151,14 +2170,32 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     const log = $('[data-assist-log]');
     addMsg(log, 'me', text);
     if (awaitingBooking){
+      const voice = $('[data-assist-voice]');
+      const c = contactFrom(text);
+      if (!c.phone && !c.email){
+        await typeMsg(log, 'ai', "I didn't catch a number or an email in that — what's the best way to reach you?", 14, voice);
+        return;                                   /* stay in this state and ask again */
+      }
       awaitingBooking = false; setChips([]);
-      toast('Saved to CRM · call requested');
-      await typeMsg(log, 'ai', "Perfect — saved. Someone from the studio will confirm a slot by text within one working day. Anything else while I've got you?", 14, $('[data-assist-voice]'));
+      const asked = pendingAsk;
+      const ok = await saveLead({
+        name: '', business: '', email: c.email, phone: c.phone,
+        need: asked ? 'Assistant - question' : 'Assistant - call requested',
+        message: (asked ? 'Asked the site assistant: "' + asked + '"\n\n'
+                         : 'Asked the site assistant to book a call.\n\n')
+                 + 'They replied: "' + text + '"'
+      });
+      pendingAsk = '';
+      if (ok) toast('Saved to CRM · ' + (asked ? 'question passed on' : 'call requested'));
+      await typeMsg(log, 'ai', ok
+        ? "Got it — saved, and someone from the studio will come back to you within one working day. Anything else while I've got you?"
+        : "I couldn't save that just now, and I'd rather tell you than pretend. Email hello@leonardopower.com or ring +44 20 4572 2164 and someone will pick it up.",
+        14, voice);
       setChips(['What does it cost?', 'How does the voice work?', 'Can I see examples?']);
       return;
     }
     const key = route(text);
-    if (key === 'fallback') toast('Saved to CRM · "' + (text.length > 34 ? text.slice(0, 34) + '…' : text) + '"');
+    if (key === 'fallback') pendingAsk = text;
     await say(key);
   }
   async function greet(){

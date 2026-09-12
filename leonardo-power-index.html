@@ -464,10 +464,21 @@ html.js .hero-copy .fly{opacity:1;transform:none;animation:hero-in .9s var(--eas
 .w10{grid-column:4/7;margin-top:-30px}
 .w11{grid-column:2/5;margin-top:10px}
 .w12{grid-column:3/6;margin-top:40px}
+.w13{grid-column:1/7;margin-top:50px}
+/* website + app pair: the browser shot beside a phone walkthrough, bottoms aligned */
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,.38fr);gap:clamp(16px,2.6vw,32px);align-items:end}
+.player.phone,.player.phone video{background:#f5f2eb}
+.player.phone video{aspect-ratio:720/1564}
+.piece .does+.does{margin-top:4px}
 @media (max-width:820px){
   .work{grid-template-columns:1fr}
-  .w1,.w2,.w3,.w4,.w5,.w6,.w7,.w8,.w9,.w10,.w11,.w12,.w-note{grid-column:1;margin-top:0}
+  .w1,.w2,.w3,.w4,.w5,.w6,.w7,.w8,.w9,.w10,.w11,.w12,.w13,.w-note{grid-column:1;margin-top:0}
   .w-note{justify-self:start}
+  .duo{grid-template-columns:1fr}
+  .player.phone{width:min(100%,300px);justify-self:center}
+  /* a long tag must not widen the whole column: let it wrap under the name */
+  .piece .cap{flex-wrap:wrap}
+  .piece .cap .tag{white-space:normal}
 }
 
 /* real screenshots of live client sites, in a browser frame */
@@ -1292,9 +1303,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <div class="head">
       <div>
         <p class="eyebrow fly" data-from="up">Selected work</p>
-        <h2 id="work-h" class="display h-lg fly" data-from="left">Sites we've built. <em>Eleven of them, live right now.</em></h2>
+        <h2 id="work-h" class="display h-lg fly" data-from="left">Sites we've built. <em>Thirteen of them, live right now.</em></h2>
       </div>
-      <p class="lead fly" data-from="up">Real builds for real businesses — trades, training, boarding kennels, coaching, acquisitions, and our own brands. Nothing here is a mock-up. Click any one of them and you'll land on the site exactly as it runs today.</p>
+      <p class="lead fly" data-from="up">Real builds for real businesses — trades, training, boarding kennels, coaching, acquisitions, a family app, and our own brands. Nothing here is a mock-up. Click any one of them and you'll land on the site exactly as it runs today.</p>
     </div>
 
     <div class="work">
@@ -1418,6 +1429,27 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         </a>
         <div class="cap"><b>Sonti</b><span class="tag">White-label AI for agencies · UK &amp; India</span></div>
         <p class="does"><b>The site</b> sells a production team to other agencies — what gets built, what it costs and who is accountable for it, laid out so a founder can price the job before booking the call.</p>
+      </article></div>
+
+      <div class="w13 fly" data-from="up"><article class="piece" style="--rot:-1.1deg">
+        <div class="duo">
+          <a class="shot" href="https://kairoo.family/" target="_blank" rel="noopener">
+            <div class="shot-bar"><i></i><i></i><i></i><span>kairoo.family</span></div>
+            <img src="/work/kairoo.webp" width="1200" height="900" loading="lazy" decoding="async" alt="Kairoo homepage — the headline &quot;You shouldn&#39;t have to be the bad cop in your own home&quot; over a twilight village of glowing cottages, with a &quot;Join the next group&quot; button.">
+            <span class="visit">Visit site ↗</span>
+          </a>
+          <div class="player phone">
+            <video src="/media/kairoo-app.mp4" poster="/media/kairoo-app.webp" preload="none" playsinline muted
+                   controlslist="nodownload" width="720" height="1564"></video>
+            <button class="play" type="button" aria-label="Play the Kairoo app walkthrough — 27 seconds">
+              <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="len">0:27</span>
+            </button>
+          </div>
+        </div>
+        <div class="cap"><b>Kairoo</b><span class="tag">Screen time for families · Website + app</span></div>
+        <p class="does"><b>The site</b> tells the bedtime argument before it mentions a feature, then lets a parent drag a handle to watch the same evening with Kairoo holding the line — and join early access without a card.</p>
+        <p class="does"><b>The app</b> is the referee itself: the child&#39;s day, the deal they helped write, and what Kairoo may decide on its own, on both phones. Play the walkthrough.</p>
       </article></div>
     </div>
   </div>

@@ -1683,7 +1683,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <span class="flag ghost">Built with you</span>
         <h3 class="display h-sm">Enterprise</h3>
         <p class="sub">Designed alongside you, and it keeps learning.</p>
-        <p class="price"><b>£1,000</b><span>+ VAT · setup, then £250 / month</span></p>
+        <p class="price"><b>£1,000</b><span>+ VAT · setup, then £499 / month</span></p>
         <ul>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Everything in Front desk</b>, and then:</span></li>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Our developers design it with you.</b> Drawn, not generated.</span></li>
@@ -2090,7 +2090,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      Opens once per visitor as soon as the page is up and the cookie banner
      has been answered. Name, email, phone and which products they want go
      to /api/lead, which tags them in GHL (business-show-2026,
-     interest-gbp / interest-signal / interest-nexus).
+     interest-gbp / interest-signal / interest-nexus) and, unless they
+     untick "Ring me now", has our AI assistant ring them straight away.
      Add ?bs26 to the URL to force it open, e.g. on the stand's iPad. -->
 <div class="bs" data-bs-modal hidden>
   <div class="bs-card" role="dialog" aria-modal="true" aria-labelledby="bs-h">
@@ -2098,7 +2099,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <p class="eyebrow">The Business Show 2026<span class="bs-where"> · London</span></p>
     <h2 id="bs-h" class="display h-sm" tabindex="-1">Which one caught your eye?</h2>
     <form class="form bs-form" data-bs-form novalidate>
-      <p class="bs-sub">Leave your details, tick what you'd like to hear about, and we'll be in touch within one working day.</p>
+      <p class="bs-sub">Leave your details and tick what you'd like to hear about. Our AI assistant rings you straight away to say hello, and the team follows up within one working day.</p>
       <div class="hp" aria-hidden="true"><label for="bs-website">Website</label><input id="bs-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
       <div class="field"><label for="bs-name">Your name</label><input id="bs-name" name="name" type="text"
         autocomplete="name" maxlength="80" required></div>
@@ -2116,6 +2117,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <label class="bs-opt"><input type="checkbox" name="interests" value="nexus"><span><b>Nexus</b><span>Our CRM, where every lead lands</span></span></label>
         <label class="bs-opt all"><input type="checkbox" data-bs-all><span><b>All three</b></span></label>
       </fieldset>
+      <label class="bs-opt bs-call"><input type="checkbox" name="callNow" data-bs-call checked><span><b>Ring me now</b><span>Our AI assistant calls this number in the next minute. The call is recorded.</span></span></label>
       <button class="btn btn-signal" type="submit" data-bs-go>Send my details <span class="arr">→</span></button>
       <p class="form-err" data-bs-error role="alert"></p>
       <p class="fine">We'll only use this to follow up on what you ticked. <a href="/privacy">Privacy policy</a>.</p>
@@ -2123,7 +2125,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <div class="bs-done" data-bs-done role="status" tabindex="-1" hidden>
       <div class="tick"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
       <h3 class="display h-sm" data-bs-done-t>Got it — thanks.</h3>
-      <p>We've saved your details and will be in touch within one working day.</p>
+      <p data-bs-done-p>We've saved your details and will be in touch within one working day.</p>
       <button class="btn btn-signal" type="button" data-bs-close>Back to the site</button>
     </div>
   </div>
@@ -2853,7 +2855,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
             email: $('#bs-email').value.trim(),
             phone: e164($('#bs-phone').value),
             website: $('#bs-website').value,
-            interests
+            interests,
+            callNow: $('[data-bs-call]', modal).checked
           })
         });
         let out = {}; try { out = await res.json(); } catch (_) {}
@@ -2861,6 +2864,8 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 
         const first = name.split(/\s+/)[0];
         if (first) $('[data-bs-done-t]', modal).textContent = 'Thanks, ' + first + ' — got it.';
+        if (out.calling) $('[data-bs-done-p]', modal).textContent =
+          'Keep your phone handy: our AI assistant is ringing you now. The team will follow up within one working day.';
         form.hidden = true; done.hidden = false; $('.bs-card', modal).classList.add('is-done');
         remember('sent');
         done.focus({ preventScroll: true });

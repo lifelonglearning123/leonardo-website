@@ -732,6 +732,55 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   @keyframes buy-in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
 }
 
+/* ── The Business Show 2026 pop-up ──────────────────────── */
+.bs{position:fixed;inset:0;z-index:96;display:flex;align-items:safe center;justify-content:center;
+  padding:16px;overflow:auto;overscroll-behavior:contain;background:rgb(var(--bg-rgb) / .72);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.bs[hidden]{display:none}
+.bs-card{position:relative;width:min(500px,100%);background:var(--bg-2);color:var(--fg);
+  border:1px solid var(--line);border-radius:var(--r-sheet);padding:clamp(22px,3.4vw,34px);
+  box-shadow:0 40px 90px -30px rgb(var(--sh) / .8)}
+.bs-card .eyebrow{margin-bottom:12px;padding-right:44px}
+.bs-sub{margin:0 0 6px;color:var(--fg-2);font-size:15.5px;line-height:1.55}
+.bs-form{gap:12px;margin-top:10px}
+.bs-form .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bs-pick{border:0;margin:4px 0 0;padding:0;display:grid;gap:8px;min-width:0}
+.bs-pick legend{padding:0;margin-bottom:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--fg-3)}
+.bs-opt{display:flex;gap:12px;align-items:center;padding:12px 14px;min-height:56px;cursor:pointer;
+  border:1px solid var(--field-line);border-radius:12px;background:var(--bg-3);
+  transition:border-color .2s,background-color .2s,box-shadow .2s}
+.bs-opt:hover{border-color:var(--accent)}
+.bs-opt input{width:20px;height:20px;flex:none;margin:0;accent-color:var(--accent);cursor:pointer}
+.bs-opt:has(input:checked){border-color:var(--accent);background:rgb(var(--accent-rgb) / .1)}
+.bs-opt:has(input:focus-visible){box-shadow:0 0 0 3px rgb(var(--accent-rgb) / .25)}
+.bs-opt b{display:block;font-weight:600;font-size:15px;line-height:1.3}
+.bs-opt span span{display:block;color:var(--fg-2);font-size:13.5px;line-height:1.4}
+.bs-opt.all{border-style:dashed}
+.bs-form .btn{width:100%;justify-content:center;margin-top:6px}
+.bs-form .fine{font-size:12.5px;color:var(--fg-3);line-height:1.5}
+.bs-form .fine a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.bs-done{display:grid;gap:10px;padding:6px 0 2px}
+.bs-done[hidden],.bs-form[hidden]{display:none}
+.bs-card h2:focus{outline:none}
+.bs-card.is-done #bs-h{display:none}
+.bs-done .tick{width:44px;height:44px;border-radius:50%;background:var(--live);color:var(--accent-ink);
+  display:grid;place-items:center;margin-bottom:6px}
+.bs-done p{margin:0;color:var(--fg-2);font-size:15.5px;line-height:1.55}
+.bs-done .btn{justify-self:start;margin-top:8px}
+@media (max-width:560px){
+  .bs{padding:10px}
+  .bs-card{padding:20px 18px 18px;border-radius:22px}
+  .bs-form .two{grid-template-columns:1fr}
+  /* 16px stops iOS Safari zooming the page when a field is tapped */
+  .bs .field input{font-size:16px;padding:12px 13px}
+  .bs-sub{font-size:15px}
+  .bs-where{display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bs-card{animation:buy-in .45s var(--ease-swoop) both}
+}
+
 /* ── floating assistant ─────────────────────────────────── */
 .assist{position:fixed;right:20px;bottom:20px;z-index:70;font-family:var(--body)}
 .assist-pill{
@@ -1907,6 +1956,49 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   </div>
 </div>
 
+<!-- ═══════════════ THE BUSINESS SHOW 2026 POP-UP ═══════════════
+     Opens once per visitor as soon as the page is up and the cookie banner
+     has been answered. Name, email, phone and which products they want go
+     to /api/lead, which tags them in GHL (business-show-2026,
+     interest-gbp / interest-signal / interest-nexus).
+     Add ?bs26 to the URL to force it open, e.g. on the stand's iPad. -->
+<div class="bs" data-bs-modal hidden>
+  <div class="bs-card" role="dialog" aria-modal="true" aria-labelledby="bs-h">
+    <button class="buy-x" type="button" data-bs-close aria-label="Close">&times;</button>
+    <p class="eyebrow">The Business Show 2026<span class="bs-where"> · London</span></p>
+    <h2 id="bs-h" class="display h-sm" tabindex="-1">Which one caught your eye?</h2>
+    <form class="form bs-form" data-bs-form novalidate>
+      <p class="bs-sub">Leave your details, tick what you'd like to hear about, and we'll be in touch within one working day.</p>
+      <div class="hp" aria-hidden="true"><label for="bs-website">Website</label><input id="bs-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <div class="field"><label for="bs-name">Your name</label><input id="bs-name" name="name" type="text"
+        autocomplete="name" maxlength="80" required></div>
+      <div class="two">
+        <div class="field"><label for="bs-email">Email</label><input id="bs-email" name="email" type="email"
+          autocomplete="email" inputmode="email" maxlength="254" required></div>
+        <div class="field"><label for="bs-phone">Phone</label><div class="phone-in"><span class="cc">+44</span><input
+          id="bs-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="7700 900123"
+          maxlength="20" required></div></div>
+      </div>
+      <fieldset class="bs-pick">
+        <legend>I'm interested in</legend>
+        <label class="bs-opt"><input type="checkbox" name="interests" value="gbp"><span><b>Google Business Profile</b><span>Show up, and get picked, on Google and Maps</span></span></label>
+        <label class="bs-opt"><input type="checkbox" name="interests" value="signal"><span><b>Signal</b><span>Our AI voice that answers every call</span></span></label>
+        <label class="bs-opt"><input type="checkbox" name="interests" value="nexus"><span><b>Nexus</b><span>Our CRM, where every lead lands</span></span></label>
+        <label class="bs-opt all"><input type="checkbox" data-bs-all><span><b>All three</b></span></label>
+      </fieldset>
+      <button class="btn btn-signal" type="submit" data-bs-go>Send my details <span class="arr">→</span></button>
+      <p class="form-err" data-bs-error role="alert"></p>
+      <p class="fine">We'll only use this to follow up on what you ticked. <a href="/privacy">Privacy policy</a>.</p>
+    </form>
+    <div class="bs-done" data-bs-done role="status" tabindex="-1" hidden>
+      <div class="tick"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h3 class="display h-sm" data-bs-done-t>Got it — thanks.</h3>
+      <p>We've saved your details and will be in touch within one working day.</p>
+      <button class="btn btn-signal" type="button" data-bs-close>Back to the site</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ PALETTE SWITCHER (review tool — remove before launch, or keep as an easter egg) ═══════════════ -->
 <div class="palette" data-palette-ui role="group" aria-label="Colour palette">
   <span class="lbl">Palette</span>
@@ -2535,6 +2627,127 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     });
   }
 
+  /* ────────────────────────────────────────────────────────
+     THE BUSINESS SHOW 2026 POP-UP
+     Once per visitor: a submit hides it for good, a close hides it
+     for a week. It waits until nothing else is in the way — the
+     cookie banner, the checkout modal, the mobile menu, or someone
+     halfway through typing in another form.
+     ──────────────────────────────────────────────────────── */
+  function initShow(){
+    const modal = $('[data-bs-modal]'); if (!modal) return;
+    const KEY = 'lp-bs26';
+    const SHOW_UNTIL = new Date('2026-12-31T23:59:59Z');   /* stops by itself after the show */
+    const DELAY = 600, SNOOZE_DAYS = 7;
+    const form = $('[data-bs-form]', modal), err = $('[data-bs-error]', modal);
+    const go = $('[data-bs-go]', modal), done = $('[data-bs-done]', modal);
+    const all = $('[data-bs-all]', modal);
+    const boxes = $$('input[name="interests"]', modal);
+    const forced = /[?&]bs26(=|&|$)/.test(location.search);
+    let lastFocus = null;
+
+    const remember = (v) => { try { localStorage.setItem(KEY, JSON.stringify({ v, ts: Date.now() })); } catch (_) {} };
+    const recall = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (_) { return null; } };
+
+    const open = () => {
+      lastFocus = document.activeElement;
+      modal.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      setTimeout(() => $('#bs-h').focus({ preventScroll: true }), 60);
+    };
+    const close = () => {
+      if (modal.hidden) return;
+      modal.hidden = true;
+      document.documentElement.style.overflow = '';
+      remember(done.hidden ? 'closed' : 'sent');
+      if (lastFocus && lastFocus.focus && lastFocus !== document.body) lastFocus.focus({ preventScroll: true });
+    };
+
+    /* "All three" ticks the lot, and shows half-ticked when only some are */
+    const sync = () => {
+      const n = boxes.filter(b => b.checked).length;
+      all.checked = n === boxes.length;
+      all.indeterminate = n > 0 && n < boxes.length;
+    };
+    all.addEventListener('change', () => { boxes.forEach(b => { b.checked = all.checked; }); sync(); });
+    boxes.forEach(b => b.addEventListener('change', sync));
+
+    $$('[data-bs-close]', modal).forEach(b => b.addEventListener('click', close));
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){ e.preventDefault(); return close(); }
+      if (e.key !== 'Tab') return;
+      const f = $$('button, input:not([tabindex="-1"]), a[href]', modal)
+        .filter(el => !el.disabled && el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.textContent = '';
+      if (!form.checkValidity()){ form.reportValidity(); return; }
+      const interests = boxes.filter(b => b.checked).map(b => b.value);
+      if (!interests.length){
+        err.textContent = 'Tick at least one, or "All three".';
+        boxes[0].focus();
+        return;
+      }
+
+      const label = go.innerHTML;
+      go.disabled = true; go.textContent = 'Sending…';
+      try {
+        const name = $('#bs-name').value.trim();
+        const res = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            form: 'business-show-2026',
+            name,
+            email: $('#bs-email').value.trim(),
+            phone: e164($('#bs-phone').value),
+            website: $('#bs-website').value,
+            interests
+          })
+        });
+        let out = {}; try { out = await res.json(); } catch (_) {}
+        if (!res.ok) throw new Error(out.error || 'We could not save that.');
+
+        const first = name.split(/\s+/)[0];
+        if (first) $('[data-bs-done-t]', modal).textContent = 'Thanks, ' + first + ' — got it.';
+        form.hidden = true; done.hidden = false; $('.bs-card', modal).classList.add('is-done');
+        remember('sent');
+        done.focus({ preventScroll: true });
+      } catch (ex) {
+        go.disabled = false; go.innerHTML = label;
+        err.textContent = (ex && ex.message ? ex.message : 'We could not save that.') +
+          ' You can also email hello@leonardopower.com.';
+      }
+    });
+
+    /* Decide whether to show it at all */
+    if (!forced){
+      if (Date.now() > SHOW_UNTIL.getTime()) return;
+      const seen = recall();
+      if (seen && (seen.v === 'sent' ||
+          (Date.now() - (seen.ts || 0)) < SNOOZE_DAYS * 86400000)) return;
+    }
+
+    const blocked = () => {
+      if ($('.lpc') || $('.lpc-mask')) return true;                    /* cookie banner or panel */
+      const buy = $('[data-buy-modal]'); if (buy && !buy.hidden) return true;
+      const menu = $('.sheet-menu'); if (menu && getComputedStyle(menu).display !== 'none') return true;
+      const a = document.activeElement;
+      return !!(a && a.matches && a.matches('input, textarea, select') && !modal.contains(a));
+    };
+    setTimeout(function tryOpen(){
+      if (blocked()) return setTimeout(tryOpen, 250);
+      open();
+    }, DELAY);
+  }
+
   /* Service icons — replay the signature motion on hover or focus */
   function initIcons(){
     $$('.card, .pstep').forEach(card => {
@@ -2572,7 +2785,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      don't swap mid-word.
      ──────────────────────────────────────────────────────── */
   function boot(){
-    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette(); initBuy();
+    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette(); initBuy(); initShow();
   }
   let booted = false; const once = () => { if (!booted){ booted = true; boot(); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);

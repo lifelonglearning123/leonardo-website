@@ -1,3 +1,8 @@
 .vercel
 /Team/
 Videos/
+.env
+.env.local
+
+.env*
+!.env.example

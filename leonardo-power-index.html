@@ -93,7 +93,11 @@
   --ease-swoop:cubic-bezier(.22,1.2,.36,1);
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;
+  /* The hero tiles poke past the right edge on phones. body's overflow-x
+     alone didn't stop mobile browsers widening the page to fit them, which
+     pushed every fixed bar (nav, offer, cookie banner) off the screen. */
+  overflow-x:clip}
 body{
   margin:0;
   background:var(--bg);
@@ -220,6 +224,41 @@ main[id],section[id]{scroll-margin-top:96px}
 .btn:hover .arr{transform:translateX(4px)}
 .btn .dot{width:8px;height:8px;border-radius:50%;background:var(--live);box-shadow:0 0 0 0 rgb(var(--live-rgb) / .5);animation:pulse 2.2s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgb(var(--live-rgb) / .55)}70%{box-shadow:0 0 0 9px rgb(var(--live-rgb) / 0)}100%{box-shadow:0 0 0 0 rgb(var(--live-rgb) / 0)}}
+
+/* ── Business Show 2026 offer bar ───────────────────────────
+   Fixed above the pill nav so it is the first thing anyone sees.
+   JS measures it into --offer-h; the nav and the page move down by
+   that much. Without JS it simply sits in the flow at the top. */
+.offer{position:relative;z-index:61;background:var(--inverse-bg);color:var(--inverse-fg)}
+html.js .offer{position:fixed;top:0;left:0;right:0}
+.offer[hidden]{display:none}
+.offer-in{display:flex;align-items:center;justify-content:center;gap:10px 16px;flex-wrap:wrap;
+  max-width:var(--max);margin:0 auto;padding:9px 56px 9px 16px;font-size:14.5px;line-height:1.35;text-align:center}
+.offer-tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;background:var(--accent);color:var(--accent-ink);white-space:nowrap}
+.offer-txt b{font-weight:650}
+.offer-txt .price{font-family:var(--display);font-weight:640;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+.offer-go{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 15px;border-radius:999px;
+  background:var(--bg);color:var(--fg);font-weight:600;font-size:14px;white-space:nowrap;
+  transition:transform .3s var(--ease-out)}
+.offer-go:hover{transform:translateY(-1px)}
+.offer-x{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;font-size:20px;line-height:1;color:inherit;opacity:.7}
+.offer-x:hover{opacity:1;background:rgb(255 255 255 / .1)}
+html.js.has-offer .nav{top:calc(var(--offer-h, 0px) + 12px)}
+html.js.has-offer body{padding-top:var(--offer-h, 0px)}
+@media (max-width:600px){
+  /* one row on a phone: words on the left, button on the right */
+  .offer-in{flex-wrap:nowrap;justify-content:space-between;gap:10px;padding:8px 44px 8px 14px;
+    font-size:13px;text-align:left}
+  .offer-tag,.offer-txt .long{display:none}
+  .offer-txt .price{font-size:14.5px}
+  .offer-go{flex:none;min-height:36px;padding:6px 12px;font-size:13px}
+  .offer-go .arr{display:none}
+  .offer-x{right:2px}
+}
+@media (min-width:601px){.offer .short{display:none}}
+@media (max-width:600px){.offer-go .long{display:none}}
 
 /* ── pill nav ───────────────────────────────────────────── */
 .nav{
@@ -1028,6 +1067,40 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 <a class="skip" href="#top">Skip to content</a>
 
 <!-- ═══════════════ NAV ═══════════════ -->
+<!-- ═══════════════ BUSINESS SHOW 2026 OFFER BAR ═══════════════
+     The button goes through "Who are we building for?" (lead saved to
+     GHL, tagged show-offer), then /api/checkout opens Stripe Checkout
+     for the £99/month bundle. Stripe keys live in env vars, see
+     .env.example. Until they're set, /api/checkout sends people to the
+     show pop-up instead, so the lead is still captured. -->
+<aside class="offer" data-offer aria-label="Business Show 2026 offer">
+  <div class="offer-in">
+    <span class="offer-tag">Business Show 2026</span>
+    <span class="offer-txt">
+      <span class="long"><b>Show special:</b> Signal, Nexus and Google Business Profile, all three for </span>
+      <span class="short"><b>Business Show offer:</b> all three for </span>
+      <span class="price">£99/month, for life</span>
+    </span>
+    <a class="offer-go" href="/api/checkout" data-buy="show"><span class="long">Claim the offer</span><span class="short">Claim</span> <span class="arr" aria-hidden="true">→</span></a>
+  </div>
+  <button class="offer-x" type="button" data-offer-close aria-label="Hide the offer">&times;</button>
+</aside>
+<script>
+/* Runs here, not with the rest, so the nav is never drawn on top of the bar.
+   Shows until the end of 2026; the x hides it for the rest of the visit. */
+(function(){
+  var bar = document.querySelector('[data-offer]'), root = document.documentElement, KEY = 'lp-offer-hidden', gone = false;
+  try { gone = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (gone || Date.now() > Date.parse('2026-12-31T23:59:59Z')) { bar.hidden = true; return; }
+  function measure(){ root.style.setProperty('--offer-h', bar.offsetHeight + 'px'); }
+  measure(); root.classList.add('has-offer');
+  if ('ResizeObserver' in window) new ResizeObserver(measure).observe(bar); else addEventListener('resize', measure);
+  bar.querySelector('[data-offer-close]').addEventListener('click', function(){
+    bar.hidden = true; root.classList.remove('has-offer');
+    try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+  });
+})();
+</script>
 <header class="nav" role="banner">
   <a class="brand" href="#top" aria-label="Leonardo Power — home">
     <span class="mark" aria-hidden="true"><span class="voice"><i></i><i></i><i></i><i></i></span></span>
@@ -2546,8 +2619,10 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      ──────────────────────────────────────────────────────── */
   const TIERS = {
     starter:   'Starter · £99 + VAT setup, then £30 + VAT a month',
-    frontdesk: 'Front desk · £99 + VAT a month, no setup fee'
+    frontdesk: 'Front desk · £99 + VAT a month, no setup fee',
+    show:      'Business Show bundle · £99 a month, for life'
   };
+  const NEEDS = { starter: 'Starter', frontdesk: 'Front desk', show: 'Business Show offer' };
 
   function initBuy(){
     const modal = $('[data-buy-modal]'); if (!modal) return;
@@ -2610,7 +2685,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
             keepalive: true,
             body: JSON.stringify({
               name, business: biz, email,
-              need: tier === 'starter' ? 'Starter' : 'Front desk',
+              need: NEEDS[tier] || 'Front desk',
               message: 'Went through to the checkout for ' + (TIERS[tier] || tier) + '.'
             })
           }),
@@ -2618,11 +2693,14 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         ]);
       } catch (_) { /* never block a payment on our own CRM */ }
 
-      const q = new URLSearchParams({
-        firstName: parts[0] || '',
-        lastName: parts.slice(1).join(' '),
-        email: email
-      });
+      /* Stripe Payment Links only prefill the email, under their own name */
+      const q = /(^|\.)stripe\.com$/.test(new URL(checkout, location.href).hostname)
+        ? new URLSearchParams({ prefilled_email: email })
+        : new URLSearchParams({
+            firstName: parts[0] || '',
+            lastName: parts.slice(1).join(' '),
+            email: email
+          });
       location.href = checkout + (checkout.indexOf('?') > -1 ? '&' : '?') + q.toString();
     });
   }
@@ -2673,6 +2751,11 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     boxes.forEach(b => b.addEventListener('change', sync));
 
     $$('[data-bs-close]', modal).forEach(b => b.addEventListener('click', close));
+    /* The offer bar uses this until its Stripe link exists */
+    $$('[data-open-bs]').forEach(a => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (modal.hidden) open();
+    }));
     modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
     modal.addEventListener('keydown', (e) => {
       if (e.key === 'Escape'){ e.preventDefault(); return close(); }
@@ -2726,6 +2809,15 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           ' You can also email hello@leonardopower.com.';
       }
     });
+
+    /* Back from Stripe having paid: thank them, and don't greet a new
+       customer with the lead pop-up */
+    if (/[?&]offer=paid(&|$)/.test(location.search)){
+      remember('sent');
+      toast('Payment received. Welcome aboard, we’ll be in touch today');
+      history.replaceState(null, '', location.pathname + location.hash);
+      return;
+    }
 
     /* Decide whether to show it at all */
     if (!forced){

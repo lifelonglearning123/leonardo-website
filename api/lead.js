@@ -27,6 +27,7 @@ const NEED_TAGS = {
   'Front desk':                                    'front-desk',
   'Assistant - call requested':                    'assistant-callback',
   'Assistant - question':                          'assistant-question',
+  'Business Show offer':                           'show-offer',
   'A new website with the voice and CRM built in': 'new-site',
   'Add the voice and CRM to my existing site':     'retrofit',
   'SEO and AEO — get found, get quoted':           'seo-aeo',

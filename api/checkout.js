@@ -2,23 +2,29 @@
    GET /api/checkout  —  Vercel serverless function
 
    The Business Show 2026 offer: Signal, Nexus and Google Business
-   Profile for £99 a month, for life. Opens a Stripe Checkout for that
+   Profile for £99 + VAT a month, for life. VAT (20%) is added on top
+   at checkout by a Stripe tax rate, so the invoice shows it separately. Opens a Stripe Checkout for that
    subscription and sends the visitor straight to it.
 
    The "Who are we building for?" step saves the lead to GHL first,
    then arrives here with ?email=… so Stripe has it filled in.
 
-   Required env vars (Vercel → Project → Settings → Environment Variables,
+   Env vars (Vercel → Project → Settings → Environment Variables,
    or .env for `vercel dev`):
-     STRIPE_SECRET_KEY      sk_live_… (or sk_test_… while testing)
-     STRIPE_SHOW_PRICE_ID   price_… — the £99/month recurring price
+     STRIPE_SECRET_KEY      required — sk_live_… / rk_live_… (sk_test_… while testing)
+     STRIPE_SHOW_PRICE_ID   optional — overrides the £99/month price below
+     STRIPE_VAT_RATE_ID     optional — overrides the 20% VAT rate below
 
-   Until both are set, visitors are sent to the show pop-up instead,
+   Until the key is set, visitors are sent to the show pop-up instead,
    so the button never dead-ends and the lead is still captured.
    ------------------------------------------------------------------ */
 
 const STRIPE_SESSIONS = 'https://api.stripe.com/v1/checkout/sessions';
 const OFFER = 'business-show-2026';
+
+/* Not secrets: IDs of objects in the live Stripe account. */
+const SHOW_PRICE = 'price_1UaMfmBdqYbaDfVseJCpyw3O';   /* £99.00 GBP a month */
+const UK_VAT     = 'txr_1UaMsoBdqYbaDfVsgj0Z1z7D';    /* VAT 20%, added on top */
 
 function siteOrigin(req) {
   const host  = req.headers['x-forwarded-host'] || req.headers.host || 'leonardopower.com';
@@ -41,10 +47,11 @@ module.exports = async (req, res) => {
 
   const origin = siteOrigin(req);
   const key    = process.env.STRIPE_SECRET_KEY;
-  const price  = process.env.STRIPE_SHOW_PRICE_ID;
+  const price  = process.env.STRIPE_SHOW_PRICE_ID || SHOW_PRICE;
+  const vat    = process.env.STRIPE_VAT_RATE_ID   || UK_VAT;
 
-  if (!key || !price) {
-    console.error('[Stripe] Missing STRIPE_SECRET_KEY or STRIPE_SHOW_PRICE_ID — sending to the pop-up');
+  if (!key) {
+    console.error('[Stripe] Missing STRIPE_SECRET_KEY — sending to the pop-up');
     return redirect(res, origin + '/?bs26');
   }
 
@@ -54,6 +61,7 @@ module.exports = async (req, res) => {
     'mode': 'subscription',
     'line_items[0][price]': price,
     'line_items[0][quantity]': '1',
+    'line_items[0][tax_rates][0]': vat,
     'success_url': origin + '/?offer=paid',
     'cancel_url': origin + '/',
     'billing_address_collection': 'required',

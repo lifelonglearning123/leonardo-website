@@ -22,6 +22,8 @@
    Locally, `python -m http.server` cannot run this — use `vercel dev`.
    ------------------------------------------------------------------ */
 
+const { entryTag, drawFor, describe } = require('./_show-draw');
+
 const UPSERT_URL  = 'https://services.leadconnectorhq.com/contacts/upsert';
 const GHL_VERSION = '2021-07-28';
 
@@ -85,7 +87,7 @@ function splitName(full) {
   return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
 }
 
-function buildPayload(data, locationId) {
+function buildPayload(data, locationId, now = Date.now()) {
   const { firstName, lastName } = splitName(data.name);
   const need = clean(data.need);
   const isEvent = data.form === EVENT_FORM;
@@ -93,6 +95,9 @@ function buildPayload(data, locationId) {
   let tags = ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : []);
   if (isEvent) {
     tags = tags.concat(EVENT_FORM, interestsOf(data).map(k => PRODUCTS[k].tag));
+    /* The hourly draw: sent while the show is open, so we met them there */
+    const draw = drawFor(now);
+    if (draw) tags.push(entryTag(draw));
   }
 
   const payload = {
@@ -276,6 +281,10 @@ function buildNote(data, call) {
   if (isEvent) {
     const picked = interestsOf(data).map(k => PRODUCTS[k].label);
     lines.push('Interested in: ' + (picked.length ? picked.join(', ') : 'nothing ticked'));
+    const draw = drawFor(Date.now());
+    lines.push(draw
+      ? 'Entered in the Business Show draw at ' + describe(draw) + '.'
+      : 'Sent outside show hours, so not entered in the hourly draw.');
     if (call) {
       lines.push(call.placed
         ? 'The AI assistant rang them straight away.'

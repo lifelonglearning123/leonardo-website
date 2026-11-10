@@ -341,13 +341,10 @@ module.exports = async (req, res) => {
     const contactId = result.body && result.body.contact && result.body.contact.id;
 
     /* Ring them before the note is written, so the note can say whether
-       the call went out. Unticking "ring me now" on the form skips it. */
-    let call = null;
-    if (data.form === EVENT_FORM) {
-      call = data.callNow === false
-        ? { placed: false, reason: 'they asked not to be rung now' }
-        : await placeShowCall(data, phone, contactId);
-    }
+       the call went out. */
+    const call = data.form === EVENT_FORM
+      ? await placeShowCall(data, phone, contactId)
+      : null;
 
     if (contactId) {
       const note = await ghl(

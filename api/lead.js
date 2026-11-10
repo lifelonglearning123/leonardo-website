@@ -33,6 +33,22 @@ const NEED_TAGS = {
   "Not sure yet — let's talk":                     'unsure'
 };
 
+/* The Business Show 2026 pop-up. Each ticked product becomes a tag, so a
+   GHL smart list or workflow can pick up "everyone who wants Signal"
+   without anyone opening the notes. Only these keys are accepted. */
+const EVENT_FORM   = 'business-show-2026';
+const EVENT_SOURCE = 'leonardopower.com — Business Show 2026 pop-up';
+const PRODUCTS = {
+  gbp:    { tag: 'interest-gbp',    label: 'Google Business Profile' },
+  signal: { tag: 'interest-signal', label: 'Signal (AI voice)' },
+  nexus:  { tag: 'interest-nexus',  label: 'Nexus (CRM)' }
+};
+
+function interestsOf(data) {
+  const raw = Array.isArray(data.interests) ? data.interests : [];
+  return Object.keys(PRODUCTS).filter(k => raw.includes(k));
+}
+
 function clean(value) {
   if (typeof value !== 'string') return '';
   return value.trim().slice(0, MAX_LEN);
@@ -59,14 +75,20 @@ function splitName(full) {
 function buildPayload(data, locationId) {
   const { firstName, lastName } = splitName(data.name);
   const need = clean(data.need);
+  const isEvent = data.form === EVENT_FORM;
+
+  let tags = ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : []);
+  if (isEvent) {
+    tags = tags.concat(EVENT_FORM, interestsOf(data).map(k => PRODUCTS[k].tag));
+  }
 
   const payload = {
     locationId,
     firstName,
     lastName,
-    source:  SOURCE,
+    source:  isEvent ? EVENT_SOURCE : SOURCE,
     country: COUNTRY,
-    tags:    ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : [])
+    tags
   };
 
   /* An empty string is not an absent field: GHL answers an empty email
@@ -107,7 +129,13 @@ function buildNote(data) {
   const stamp = new Date().toLocaleString('en-GB', {
     dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London'
   });
-  const lines = ['Website lead — ' + stamp, ''];
+  const isEvent = data.form === EVENT_FORM;
+  const lines = [(isEvent ? 'Business Show 2026 pop-up — ' : 'Website lead — ') + stamp, ''];
+
+  if (isEvent) {
+    const picked = interestsOf(data).map(k => PRODUCTS[k].label);
+    lines.push('Interested in: ' + (picked.length ? picked.join(', ') : 'nothing ticked'));
+  }
 
   const business = clean(data.business);
   const need     = clean(data.need);

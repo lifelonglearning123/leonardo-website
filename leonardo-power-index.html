@@ -983,6 +983,10 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 .tier .btn{margin-top:26px;width:100%;justify-content:center}
 .tier .tier-note{margin-top:13px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;
   color:var(--fg-3);line-height:1.7}
+.solo-head{margin:clamp(48px,6vw,80px) 0 22px;display:flex;align-items:baseline;justify-content:space-between;
+  gap:8px 24px;flex-wrap:wrap}
+.solo-head h3{margin:0}
+.solo-head p{margin:0;color:var(--fg-2);font-size:15px}
 @media (max-width:900px){
   .tiers{grid-template-columns:1fr}
   .tier{border-left:0;border-top:1px solid var(--line)}
@@ -1646,7 +1650,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <span class="flag ghost">Self-serve</span>
         <h3 class="display h-sm">Starter</h3>
         <p class="sub">A site, live and looking right.</p>
-        <p class="price"><b>£30</b><span>+ VAT · per month</span></p>
+        <p class="price"><b>£99</b><span>+ VAT · per month</span></p>
         <p class="price-setup">plus <b>£99 + VAT</b> to set it up and build it</p>
         <ul>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>A website generated from your brief.</b> You give us the information; we build it.</span></li>
@@ -1654,7 +1658,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>SEO optimised</b> from the information you provide.</span></li>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Hosting, updates and security</b> included for as long as you're with us.</span></li>
         </ul>
-        <a class="btn btn-ghost" href="https://link.fastpaydirect.com/payment-link/6aa13cf5ceb12d9fc1a8be6a" data-buy="starter">Get started <span class="arr">→</span></a>
+        <a class="btn btn-ghost" href="/api/checkout?plan=starter" data-buy="starter">Get started <span class="arr">→</span></a>
         <p class="tier-note">Pay by card and we start today. Monthly, cancel with 30 days' notice.</p>
       </div>
 
@@ -1662,7 +1666,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <span class="flag">Most popular</span>
         <h3 class="display h-sm">Front desk</h3>
         <p class="sub">The site, plus the voice and the memory.</p>
-        <p class="price"><b>£99</b><span>+ VAT · per month</span></p>
+        <p class="price"><b>£299</b><span>+ VAT · per month</span></p>
         <ul>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Website design</b> built around the information you give us.</span></li>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Five rounds of changes.</b></span></li>
@@ -1671,7 +1675,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>The CRM.</b> Every conversation saved against the caller.</span></li>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>SEO optimised</b> from day one.</span></li>
         </ul>
-        <a class="btn btn-primary" href="https://link.fastpaydirect.com/payment-link/6aa13d17e9a073174b3b55ed" data-buy="frontdesk">Get started <span class="arr">→</span></a>
+        <a class="btn btn-primary" href="/api/checkout?plan=frontdesk" data-buy="frontdesk">Get started <span class="arr">→</span></a>
         <p class="tier-note">No setup fee. Pay by card and we start today. Monthly, so you can stop if it isn't earning.</p>
       </div>
 
@@ -1690,6 +1694,59 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         </ul>
         <a class="btn btn-ghost" href="https://api.leadconnectorhq.com/widget/booking/c6jqHKI3Ymq2b5DJ5HzP" target="_blank" rel="noopener">Book a call <span class="arr">→</span></a>
         <p class="tier-note">For businesses that want the site to do the selling.</p>
+      </div>
+
+    </div>
+
+    <div class="solo-head fly" data-from="up">
+      <h3 class="display h-md">Or just the part you need.</h3>
+      <p>Each one on its own, no website required.</p>
+    </div>
+
+    <div class="tiers fly" data-from="up">
+
+      <div class="tier">
+        <span class="flag ghost">AI voice</span>
+        <h3 class="display h-sm">Signal</h3>
+        <p class="sub">An AI voice that answers every call.</p>
+        <p class="price"><b>£100</b><span>+ VAT · per month</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Unlimited calls</b> for small businesses.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Call forwarding</b> to you or your team.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Call merging</b> when a caller needs a person.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Full upgrades</b> as Signal improves.</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="/api/checkout?plan=signal" data-buy="signal">Get started <span class="arr">→</span></a>
+        <p class="tier-note">Free setup. Rolling monthly, cancel with 30 days' notice.</p>
+      </div>
+
+      <div class="tier">
+        <span class="flag ghost">Get found</span>
+        <h3 class="display h-sm">Google Business Profile</h3>
+        <p class="sub">Your profile, worked on every week.</p>
+        <p class="price"><b>£50</b><span>+ VAT · per month</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>SEO</b> for the searches that bring work.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Weekly posting:</b> images, text, articles and video.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Profile optimisation.</b></span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Competitor analysis.</b></span></li>
+        </ul>
+        <a class="btn btn-ghost" href="/api/checkout?plan=gbp" data-buy="gbp">Get started <span class="arr">→</span></a>
+        <p class="tier-note">Free setup. Rolling monthly, cancel with 30 days' notice.</p>
+      </div>
+
+      <div class="tier">
+        <span class="flag ghost">CRM</span>
+        <h3 class="display h-sm">Nexus</h3>
+        <p class="sub">The CRM, with no limits.</p>
+        <p class="price"><b>£100</b><span>+ VAT · per month</span></p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Unlimited seats</b> for your whole team.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Unlimited AI</b> inside the platform.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg><span><b>Unlimited contacts.</b></span></li>
+        </ul>
+        <a class="btn btn-ghost" href="/api/checkout?plan=nexus" data-buy="nexus">Get started <span class="arr">→</span></a>
+        <p class="tier-note">Free setup. Rolling monthly, cancel with 30 days' notice.</p>
       </div>
 
     </div>
@@ -2618,11 +2675,15 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      nothing is typed twice. The lead is saved even if they never pay.
      ──────────────────────────────────────────────────────── */
   const TIERS = {
-    starter:   'Starter · £99 + VAT setup, then £30 + VAT a month',
-    frontdesk: 'Front desk · £99 + VAT a month, no setup fee',
+    starter:   'Starter · £99 + VAT setup, then £99 + VAT a month',
+    frontdesk: 'Front desk · £299 + VAT a month, no setup fee',
+    signal:    'Signal · £100 + VAT a month, free setup',
+    gbp:       'Google Business Profile · £50 + VAT a month, free setup',
+    nexus:     'Nexus · £100 + VAT a month, free setup',
     show:      'Business Show bundle · £99 + VAT a month, for life'
   };
-  const NEEDS = { starter: 'Starter', frontdesk: 'Front desk', show: 'Business Show offer' };
+  const NEEDS = { starter: 'Starter', frontdesk: 'Front desk', signal: 'Signal', gbp: 'Google Business Profile',
+                  nexus: 'Nexus', show: 'Business Show offer' };
 
   function initBuy(){
     const modal = $('[data-buy-modal]'); if (!modal) return;

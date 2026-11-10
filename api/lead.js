@@ -10,6 +10,15 @@
      GHL_LOCATION_ID   the sub-account / location ID
      GHL_TOKEN         Private Integration Token with contacts.write
 
+   Optional, for the Business Show follow-up call (see "THE FOLLOW-UP
+   CALL" below). With any of the first three missing, no call is placed
+   and the form behaves exactly as before:
+     RETELL_API_KEY         Leonardo Power's Retell API key
+     SHOW_CALL_AGENT_ID     the Retell agent that makes the call (agent_…)
+     SHOW_CALL_FROM_NUMBER  the number it rings from, E.164 (+447…)
+     SHOW_CALL_ENABLED      set to "false" to stop the calls without a deploy
+     SHOW_CALL_DAILY_CAP    most calls in any 24 hours (default 60)
+
    Locally, `python -m http.server` cannot run this — use `vercel dev`.
    ------------------------------------------------------------------ */
 
@@ -126,10 +135,138 @@ async function ghl(url, token, body) {
   return { ok: res.ok, status: res.status, body: parsed };
 }
 
+/* ------------------------------------------------------------------
+   THE FOLLOW-UP CALL
+
+   Someone who sends the Business Show form is rung straight away by
+   Leonardo Power's own AI assistant, which knows their first name and
+   what they ticked. The call is the demonstration.
+
+   The agent's script is agent/show-call-prompt.md. It lives in Retell;
+   that file is the copy to edit and re-send.
+
+   Anyone can type any number into a web form, so before ringing:
+     - UK landlines and mobiles only (no premium, personal or pager ranges)
+     - 08:00 to 21:00 UK time only
+     - a number is rung once (Retell's call list, 60 days back)
+     - no more than SHOW_CALL_DAILY_CAP calls in any 24 hours
+   Retell's own call list is the record for the last two, so there is no
+   database here. If that list can't be read, nobody is rung.
+
+   A call that isn't placed never fails the form: the lead is already
+   saved, and the team follows up as they always did.
+   ------------------------------------------------------------------ */
+const RETELL_BASE    = 'https://api.retellai.com';
+const RETELL_TIMEOUT = 6000;
+const CALL_DAILY_CAP = 60;
+const DAY_MS         = 24 * 60 * 60 * 1000;
+const ONCE_WINDOW_MS = 60 * DAY_MS;
+
+/* 01, 02, 03 and real mobiles. Not 070 (personal numbers), 076 (pagers),
+   08 or 09. */
+const UK_CALLABLE = /^\+44(?:1\d{8,9}|2\d{9}|3\d{9}|7[1-57-9]\d{8})$/;
+
+function showCallConfig() {
+  const apiKey     = (process.env.RETELL_API_KEY || '').trim();
+  const agentId    = (process.env.SHOW_CALL_AGENT_ID || '').trim();
+  const fromNumber = (process.env.SHOW_CALL_FROM_NUMBER || '').trim();
+  if (!apiKey || !agentId || !/^\+\d{8,15}$/.test(fromNumber)) return null;
+  if ((process.env.SHOW_CALL_ENABLED || '').trim().toLowerCase() === 'false') return null;
+  const cap = Number((process.env.SHOW_CALL_DAILY_CAP || '').trim());
+  return {
+    apiKey, agentId, fromNumber,
+    dailyCap: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : CALL_DAILY_CAP
+  };
+}
+
+function londonHour(now) {
+  return Number(new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London', hour: 'numeric', hour12: false
+  }).format(now)) % 24;
+}
+
+/* "Signal", "Signal and Nexus", or all three by name: read aloud by the
+   agent, so written the way a person would say it. */
+function spokenInterests(keys) {
+  const names = { gbp: 'Google Business Profile', signal: 'Signal', nexus: 'Nexus' };
+  const picked = ['signal', 'nexus', 'gbp'].filter(k => keys.includes(k)).map(k => names[k]);
+  if (picked.length === 3) return 'all three: Signal, Nexus and Google Business Profile';
+  if (picked.length === 2) return picked[0] + ' and ' + picked[1];
+  return picked[0] || 'what Leonardo Power does';
+}
+
+async function retell(path, apiKey, body) {
+  const res = await fetch(RETELL_BASE + path, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(RETELL_TIMEOUT)
+  });
+  let parsed = null;
+  try { parsed = await res.json(); } catch (_) { /* empty or non-JSON */ }
+  return { ok: res.ok, status: res.status, body: parsed };
+}
+
+/* Returns { placed: true } or { placed: false, reason } — the reason goes
+   on the contact's note and in the log, never to the browser. */
+async function placeShowCall(data, phone, contactId, now = new Date()) {
+  const cfg = showCallConfig();
+  if (!cfg) return { placed: false, reason: 'calls are switched off' };
+  if (!UK_CALLABLE.test(phone)) return { placed: false, reason: 'not a UK landline or mobile' };
+  const hour = londonHour(now);
+  if (hour < 8 || hour >= 21) return { placed: false, reason: 'outside 08:00 to 21:00' };
+
+  try {
+    /* Retell's v3 list: typed filters, and the calls come back in `items`.
+       One page is 1,000 calls, far more than the show will make. */
+    const recent = await retell('/v3/list-calls', cfg.apiKey, {
+      filter_criteria: {
+        agent_id: [cfg.agentId],
+        start_timestamp: { type: 'number', op: 'ge', value: now.getTime() - ONCE_WINDOW_MS }
+      },
+      sort_order: 'descending',
+      limit: 1000
+    });
+    const calls = recent.body && recent.body.items;
+    if (!recent.ok || !Array.isArray(calls)) {
+      console.error('[Call] Could not read recent calls:', recent.status, recent.body);
+      return { placed: false, reason: 'could not check earlier calls' };
+    }
+    if (calls.some(c => c && c.to_number === phone)) {
+      return { placed: false, reason: 'this number has already been rung' };
+    }
+    const dayAgo = now.getTime() - DAY_MS;
+    const today = calls.filter(c => c && Number(c.start_timestamp) >= dayAgo).length;
+    if (today >= cfg.dailyCap) {
+      console.error('[Call] Daily cap reached:', today);
+      return { placed: false, reason: 'the daily limit of calls was reached' };
+    }
+
+    const call = await retell('/v2/create-phone-call', cfg.apiKey, {
+      from_number: cfg.fromNumber,
+      to_number: phone,
+      override_agent_id: cfg.agentId,
+      metadata: { source: EVENT_FORM, ghl_contact_id: contactId || '' },
+      retell_llm_dynamic_variables: {
+        first_name: splitName(data.name).firstName || 'there',
+        interests: spokenInterests(interestsOf(data))
+      }
+    });
+    if (!call.ok || !call.body || !call.body.call_id) {
+      console.error('[Call] Retell would not place the call:', call.status, call.body);
+      return { placed: false, reason: 'the call could not be started' };
+    }
+    return { placed: true };
+  } catch (err) {
+    console.error('[Call] Request error:', err);
+    return { placed: false, reason: 'the call could not be started' };
+  }
+}
+
 /* The answers that have no standard GHL field go on as a note. A note
    always lands, whereas a custom field silently vanishes if the key
    doesn't exist in the location. */
-function buildNote(data) {
+function buildNote(data, call) {
   const stamp = new Date().toLocaleString('en-GB', {
     dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London'
   });
@@ -139,6 +276,11 @@ function buildNote(data) {
   if (isEvent) {
     const picked = interestsOf(data).map(k => PRODUCTS[k].label);
     lines.push('Interested in: ' + (picked.length ? picked.join(', ') : 'nothing ticked'));
+    if (call) {
+      lines.push(call.placed
+        ? 'The AI assistant rang them straight away.'
+        : 'The AI assistant did not ring them: ' + call.reason + '.');
+    }
   }
 
   const business = clean(data.business);
@@ -198,10 +340,19 @@ module.exports = async (req, res) => {
 
     const contactId = result.body && result.body.contact && result.body.contact.id;
 
+    /* Ring them before the note is written, so the note can say whether
+       the call went out. Unticking "ring me now" on the form skips it. */
+    let call = null;
+    if (data.form === EVENT_FORM) {
+      call = data.callNow === false
+        ? { placed: false, reason: 'they asked not to be rung now' }
+        : await placeShowCall(data, phone, contactId);
+    }
+
     if (contactId) {
       const note = await ghl(
         `https://services.leadconnectorhq.com/contacts/${contactId}/notes`,
-        token, { body: buildNote(data) });
+        token, { body: buildNote(data, call) });
       /* The lead is safely in GHL. A missing note is an inconvenience
          for whoever picks it up, not a reason to tell the visitor it failed. */
       if (!note.ok) console.error('[GHL] Note failed for', contactId, note.status, note.body);
@@ -209,7 +360,7 @@ module.exports = async (req, res) => {
       console.error('[GHL] Upsert returned no contact id; note skipped');
     }
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, calling: !!(call && call.placed) });
   } catch (err) {
     console.error('[GHL] Request error:', err);
     return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.com.' });

@@ -1070,7 +1070,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
 <!-- ═══════════════ BUSINESS SHOW 2026 OFFER BAR ═══════════════
      The button goes through "Who are we building for?" (lead saved to
      GHL, tagged show-offer), then /api/checkout opens Stripe Checkout
-     for the £99/month bundle. Stripe keys live in env vars, see
+     for the £99 + VAT a month bundle. Stripe keys live in env vars, see
      .env.example. Until they're set, /api/checkout sends people to the
      show pop-up instead, so the lead is still captured. -->
 <aside class="offer" data-offer aria-label="Business Show 2026 offer">
@@ -1079,7 +1079,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <span class="offer-txt">
       <span class="long"><b>Show special:</b> Signal, Nexus and Google Business Profile, all three for </span>
       <span class="short"><b>Business Show offer:</b> all three for </span>
-      <span class="price">£99/month, for life</span>
+      <span class="price">£99 + VAT a month, for life</span>
     </span>
     <a class="offer-go" href="/api/checkout" data-buy="show"><span class="long">Claim the offer</span><span class="short">Claim</span> <span class="arr" aria-hidden="true">→</span></a>
   </div>
@@ -2620,7 +2620,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   const TIERS = {
     starter:   'Starter · £99 + VAT setup, then £30 + VAT a month',
     frontdesk: 'Front desk · £99 + VAT a month, no setup fee',
-    show:      'Business Show bundle · £99 a month, for life'
+    show:      'Business Show bundle · £99 + VAT a month, for life'
   };
   const NEEDS = { starter: 'Starter', frontdesk: 'Front desk', show: 'Business Show offer' };
 

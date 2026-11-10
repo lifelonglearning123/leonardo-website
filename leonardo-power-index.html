@@ -954,6 +954,40 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   .cb-form .two{grid-template-columns:1fr}
 }
 
+/* ── Business Show hourly draw board (11–12 Nov 2026 only) ── */
+.draw{padding:clamp(56px,7vw,96px) 0 clamp(24px,3vw,40px)}
+.draw[hidden]{display:none}
+.draw-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px 48px;align-items:end}
+.draw-head h2{margin:0}
+.draw-head p{margin:0;color:var(--fg-2);font-size:17px;line-height:1.55;max-width:52ch}
+.draw-head .btn{margin-top:18px}
+.draw-days{display:grid;grid-template-columns:1fr 1fr;margin-top:clamp(28px,3.5vw,44px);
+  border:1px solid var(--line);border-radius:var(--r-sheet);overflow:hidden;background:rgb(var(--bg2-rgb) / .35)}
+.draw-day{padding:clamp(20px,2.4vw,32px)}
+.draw-day + .draw-day{border-left:1px solid var(--line)}
+.draw-day h3{margin:0 0 6px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--fg-3)}
+.draw-day ol{list-style:none;margin:0;padding:0}
+.draw-row{display:grid;grid-template-columns:58px minmax(0,1fr);gap:14px;align-items:center;
+  padding:12px 0;border-top:1px dashed var(--line);min-height:58px}
+.draw-row:first-child{border-top:0}
+.draw-row time{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--fg-3)}
+.draw-row .who{min-width:0;color:var(--fg-3);font-size:15px;line-height:1.35}
+.draw-row .who b{display:block;color:var(--fg);font-weight:600;font-size:16px;overflow-wrap:anywhere}
+.draw-row .who span{display:block;overflow-wrap:anywhere}
+.draw-row.is-won time{color:var(--fg)}
+.draw-row.is-won .who span{color:var(--fg-2)}
+.draw-row.is-won .who b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--live);margin:0 9px 2px 0;vertical-align:middle}
+.draw-row.is-next .who{color:var(--accent);font-weight:500}
+.draw-row.is-drawing .who{color:var(--accent);font-weight:500}
+.draw-fine{margin:16px 0 0;font-size:13px;line-height:1.55;color:var(--fg-3);max-width:80ch}
+@media (max-width:900px){
+  .draw-head{grid-template-columns:1fr}
+  .draw-days{grid-template-columns:1fr}
+  .draw-day + .draw-day{border-left:0;border-top:1px solid var(--line)}
+}
+
 /* ── pricing ────────────────────────────────────────────── */
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);
   border-radius:var(--r-sheet);overflow:hidden;background:rgb(var(--bg2-rgb) / .35)}
@@ -1234,6 +1268,29 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
         <li>Answers questions at <em>2am</em></li><li>Books the appointment</li><li>Remembers returning visitors</li><li>Fills in your CRM</li><li>Knows <em>who's calling</em></li><li>Ranks on Google</li><li>Gets quoted by ChatGPT</li><li>Texts you when a hot lead lands</li><li>Never puts anyone on hold</li>
       </ul>
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════ BUSINESS SHOW HOURLY DRAW ═══════════════
+     Only while the show is on (to the end of 12 Nov 2026). Rows are
+     drawn from the schedule; /api/draw fills in the winners. -->
+<section class="draw" id="draw" data-draw hidden aria-labelledby="draw-h">
+  <div class="wrap">
+    <div class="draw-head">
+      <div>
+        <p class="eyebrow">The Business Show 2026 · hourly draw</p>
+        <h2 id="draw-h" class="display h-md">A winner every hour.</h2>
+      </div>
+      <div>
+        <p>Leave your details while the show is on and you're in the next draw. Every hour, one entry wins a Leonardo Power product free for a year.</p>
+        <button class="btn btn-primary" type="button" data-open-bs>Enter the draw <span class="arr">→</span></button>
+      </div>
+    </div>
+    <div class="draw-days">
+      <div class="draw-day"><h3>Wednesday 11 November</h3><ol data-draw-day="2026-11-11"></ol></div>
+      <div class="draw-day"><h3>Thursday 12 November</h3><ol data-draw-day="2026-11-12"></ol></div>
+    </div>
+    <p class="draw-fine">Free to enter, no purchase needed. One prize per person. Winners are shown by first name, surname initial and business, and we'll contact them by phone or email.</p>
   </div>
 </section>
 
@@ -2100,10 +2157,14 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
     <p class="eyebrow">The Business Show 2026<span class="bs-where"> · London</span></p>
     <h2 id="bs-h" class="display h-sm" tabindex="-1">Which one caught your eye?</h2>
     <form class="form bs-form" data-bs-form novalidate>
-      <p class="bs-sub">Leave your details, tick what you'd like to hear about, and we'll be in touch within one working day.</p>
+      <p class="bs-sub">Leave your details, tick what you'd like to hear about, and we'll be in touch within one working day. While the show is on, you're also in our hourly draw to win a Leonardo Power product free for a year.</p>
       <div class="hp" aria-hidden="true"><label for="bs-website">Website</label><input id="bs-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-      <div class="field"><label for="bs-name">Your name</label><input id="bs-name" name="name" type="text"
-        autocomplete="name" maxlength="80" required></div>
+      <div class="two">
+        <div class="field"><label for="bs-name">Your name</label><input id="bs-name" name="name" type="text"
+          autocomplete="name" maxlength="80" required></div>
+        <div class="field"><label for="bs-biz">Your business</label><input id="bs-biz" name="business" type="text"
+          autocomplete="organization" maxlength="120" required></div>
+      </div>
       <div class="two">
         <div class="field"><label for="bs-email">Email</label><input id="bs-email" name="email" type="email"
           autocomplete="email" inputmode="email" maxlength="254" required></div>
@@ -2120,7 +2181,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
       </fieldset>
       <button class="btn btn-signal" type="submit" data-bs-go>Send my details <span class="arr">→</span></button>
       <p class="form-err" data-bs-error role="alert"></p>
-      <p class="fine">We'll only use this to follow up on what you ticked. <a href="/privacy">Privacy policy</a>.</p>
+      <p class="fine">We'll only use this to follow up on what you ticked. If you win the draw, we show your first name, surname initial and business on this site. <a href="/privacy">Privacy policy</a>.</p>
     </form>
     <div class="bs-done" data-bs-done role="status" tabindex="-1" hidden>
       <div class="tick"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
@@ -2769,6 +2830,77 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
   }
 
   /* ────────────────────────────────────────────────────────
+     THE BUSINESS SHOW HOURLY DRAW BOARD
+     Draws the schedule straight away, then asks /api/draw for the
+     winners, again every minute and just after each draw. Gone by
+     itself after the show. ?drawdemo shows made-up winners.
+     ──────────────────────────────────────────────────────── */
+  function initDraw(){
+    const box = $('[data-draw]'); if (!box) return;
+    const DRAWS = ['2026-11-11T11:00:00Z','2026-11-11T12:00:00Z','2026-11-11T13:00:00Z','2026-11-11T14:00:00Z',
+      '2026-11-11T15:00:00Z','2026-11-11T16:00:00Z','2026-11-12T11:00:00Z','2026-11-12T12:00:00Z',
+      '2026-11-12T13:00:00Z','2026-11-12T14:00:00Z','2026-11-12T15:00:00Z'];
+    const UNTIL = Date.parse('2026-11-13T00:00:00Z');
+    const demo = /[?&]drawdemo(=|&|$)/.test(location.search);
+    const clock = () => demo ? Date.parse('2026-11-11T14:20:00Z') : Date.now();
+    if (clock() >= UNTIL) return;
+    box.hidden = false;
+
+    const hhmm = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' });
+    const esc = (t) => String(t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
+    let data = {};
+
+    const render = () => {
+      const now = clock();
+      const next = DRAWS.find(at => Date.parse(at) > now);
+      $$('[data-draw-day]', box).forEach(ol => {
+        ol.innerHTML = DRAWS.filter(at => at.startsWith(ol.dataset.drawDay)).map(at => {
+          const t = Date.parse(at), d = data[at] || {};
+          let cls = '', who;
+          if (d.status === 'won') {
+            cls = 'is-won';
+            who = '<b>' + esc(d.name) + '</b>' + (d.business ? '<span>' + esc(d.business) + '</span>' : '');
+          } else if (t <= now) {
+            if (d.status === 'no-entries') who = 'No entries this hour';
+            else { cls = 'is-drawing'; who = 'Drawing now…'; }
+          } else if (at === next) {
+            const mins = Math.max(1, Math.round((t - now) / 60000));
+            cls = 'is-next';
+            who = mins <= 90 ? 'Next draw, in ' + mins + ' min' : 'First draw';
+          } else {
+            who = 'To be drawn';
+          }
+          return '<li class="draw-row ' + cls + '"><time datetime="' + at + '">' + hhmm(at) + '</time><div class="who">' + who + '</div></li>';
+        }).join('');
+      });
+    };
+
+    const load = async () => {
+      if (demo) {
+        data = {
+          '2026-11-11T11:00:00Z': { status: 'won', name: 'Sarah K.', business: 'Kettering Physiotherapy' },
+          '2026-11-11T12:00:00Z': { status: 'won', name: 'Dev P.', business: 'Patel & Sons Electrical' },
+          '2026-11-11T13:00:00Z': { status: 'won', name: 'Joanne M.', business: 'The Little Bakehouse' },
+          '2026-11-11T14:00:00Z': { status: 'won', name: 'Tom W.', business: 'Wright Roofing Ltd' }
+        };
+        return render();
+      }
+      try {
+        const r = await fetch('/api/draw', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error(r.status);
+        const out = await r.json();
+        data = {};
+        (out.draws || []).forEach(d => { data[new Date(d.at).toISOString().replace('.000Z', 'Z')] = d; });
+      } catch (_) { /* keep showing the schedule */ }
+      render();
+    };
+
+    render(); load();
+    setInterval(() => { if (!document.hidden) load(); }, 60000);
+    setInterval(render, 20000);
+  }
+
+  /* ────────────────────────────────────────────────────────
      THE BUSINESS SHOW 2026 POP-UP
      Once per visitor: a submit hides it for good, a close hides it
      for a week. It waits until nothing else is in the way — the
@@ -2852,6 +2984,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
           body: JSON.stringify({
             form: 'business-show-2026',
             name,
+            business: $('#bs-biz').value.trim(),
             email: $('#bs-email').value.trim(),
             phone: e164($('#bs-phone').value),
             website: $('#bs-website').value,
@@ -2942,7 +3075,7 @@ footer{border-top:1px solid var(--line);padding:44px 0 120px;margin-top:40px}
      don't swap mid-word.
      ──────────────────────────────────────────────────────── */
   function boot(){
-    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette(); initBuy(); initShow();
+    initReveals(); initFlow(); initParallax(); initNav(); initAssist(); initForm(); initFaq(); initVideos(); initIcons(); initCallback(); initPalette(); initBuy(); initShow(); initDraw();
   }
   let booted = false; const once = () => { if (!booted){ booted = true; boot(); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(once);

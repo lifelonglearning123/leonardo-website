@@ -3,6 +3,7 @@
     { "source": "/", "destination": "/leonardo-power-index.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/cookies", "destination": "/cookies.html" }
+    { "source": "/cookies", "destination": "/cookies.html" },
+    { "source": "/show", "destination": "/show.html" }
   ]
 }

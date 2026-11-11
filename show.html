@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Leonardo Power</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: none; }
+  video { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: contain; background: #000; }
+  #hint { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); font: 16px Arial, sans-serif;
+          color: #fff; background: rgba(0,0,0,.6); padding: 10px 16px; border-radius: 8px; transition: opacity .6s; }
+</style>
+</head>
+<body>
+<video id="v" src="/media/show/leonardo-show.mp4" autoplay muted loop playsinline preload="auto"></video>
+<div id="hint">Click or press F for full screen</div>
+<script>
+  var v = document.getElementById('v'), hint = document.getElementById('hint');
+  function full() {
+    var el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+    v.play();
+  }
+  document.addEventListener('click', full);
+  document.addEventListener('keydown', function (e) { if (e.key === 'f' || e.key === 'F' || e.key === 'Enter') full(); });
+  setTimeout(function () { hint.style.opacity = 0; }, 5000);
+  v.addEventListener('pause', function () { v.play(); });
+</script>
+</body>
+</html>

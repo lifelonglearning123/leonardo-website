@@ -19,6 +19,9 @@
      SHOW_CALL_ENABLED      set to "false" to stop the calls without a deploy
      SHOW_CALL_DAILY_CAP    most calls in any 24 hours (default 60)
 
+   Optional, for the Business Show WhatsApp message (see "THE WHATSAPP
+   MESSAGE" below): WHATSAPP_CONSOLE_URL and WHATSAPP_CONSOLE_SECRET.
+
    Locally, `python -m http.server` cannot run this — use `vercel dev`.
    ------------------------------------------------------------------ */
 
@@ -263,10 +266,129 @@ async function placeShowCall(data, phone, contactId, now = new Date()) {
   }
 }
 
+/* ------------------------------------------------------------------
+   THE WHATSAPP MESSAGE
+
+   Someone who sends the Business Show form also gets the approved
+   template `business_show_first_contact` on WhatsApp, straight away,
+   from the "Leonardo whatsapp" client in the WhatsApp console
+   (c:\Python\whatsapp), through its partner API:
+     GET  /api/partner/nexus/contact   have we written to them before?
+     POST /api/partner/nexus/send      the template, with the video header
+
+   The template: a video, then "Hi {{1}} … That's {{2}} — not a demo".
+   {{1}} is the first name, {{2}} what they ticked.
+
+   Each number is messaged once: if the console already knows them, it
+   is skipped. Opt-outs and numbers not on WhatsApp are refused by the
+   console itself. As with the call, a message that isn't sent never
+   fails the form.
+
+   Env vars (without the first two, nothing is sent):
+     WHATSAPP_CONSOLE_URL     the console's address, no trailing slash
+     WHATSAPP_CONSOLE_SECRET  its NEXUS_PARTNER_SECRET
+     SHOW_WHATSAPP_ENABLED    "false" stops the messages without a deploy
+     SHOW_WHATSAPP_LOCATION_ID / _TEMPLATE_ID / _VIDEO_URL  override the
+                              defaults below
+   ------------------------------------------------------------------ */
+const WA_TIMEOUT = 8000;
+const WA_DEFAULTS = {
+  locationId: 'glJLLR7g7r7guHRWEilj',                   // "Leonardo whatsapp"
+  templateId: 'eefa96ca-0192-4aca-8452-c3ceb9a3dee7',   // business_show_first_contact
+  videoUrl:   'https://gqmeqeobbetvsdbq.public.blob.vercel-storage.com/clients/dbbc239d-19b6-44a6-9b12-59e22b0cb78a/leonardo-bold-1080p_squished-mNichc6rB2Y3OYnbsDFZ5vJkKrOPJO.mp4'
+};
+
+function showWhatsAppConfig() {
+  const base   = (process.env.WHATSAPP_CONSOLE_URL || '').trim().replace(/\/+$/, '');
+  const secret = (process.env.WHATSAPP_CONSOLE_SECRET || '').trim();
+  if (!/^https:\/\//.test(base) || !secret) return null;
+  if ((process.env.SHOW_WHATSAPP_ENABLED || '').trim().toLowerCase() === 'false') return null;
+  const env = k => (process.env[k] || '').trim();
+  return {
+    base, secret,
+    locationId: env('SHOW_WHATSAPP_LOCATION_ID') || WA_DEFAULTS.locationId,
+    templateId: env('SHOW_WHATSAPP_TEMPLATE_ID') || WA_DEFAULTS.templateId,
+    videoUrl:   env('SHOW_WHATSAPP_VIDEO_URL')   || WA_DEFAULTS.videoUrl
+  };
+}
+
+/* "Signal", "Signal and Nexus", "Signal, Nexus and Google Business
+   Profile": read in "That's {{2}} — not a demo". */
+function writtenInterests(keys) {
+  const names = { gbp: 'Google Business Profile', signal: 'Signal', nexus: 'Nexus' };
+  const picked = ['signal', 'nexus', 'gbp'].filter(k => keys.includes(k)).map(k => names[k]);
+  if (!picked.length) return 'Leonardo Power';
+  if (picked.length === 1) return picked[0];
+  return picked.slice(0, -1).join(', ') + ' and ' + picked[picked.length - 1];
+}
+
+async function wa(cfg, method, path, body) {
+  const res = await fetch(cfg.base + '/api/partner/nexus' + path, {
+    method,
+    headers: { 'Authorization': `Bearer ${cfg.secret}`, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(WA_TIMEOUT)
+  });
+  let parsed = null;
+  try { parsed = await res.json(); } catch (_) { /* empty or non-JSON */ }
+  return { ok: res.ok, status: res.status, body: parsed };
+}
+
+/* Returns { sent: true } or { sent: false, reason } — for the note and
+   the log, never the browser. */
+async function sendShowWhatsApp(data, phone, contactId) {
+  const cfg = showWhatsAppConfig();
+  if (!cfg) return { sent: false, reason: 'WhatsApp messages are switched off' };
+  if (!/^\+\d{10,15}$/.test(phone)) return { sent: false, reason: 'no usable phone number' };
+
+  try {
+    const q = new URLSearchParams({ locationId: cfg.locationId, phone });
+    const known = await wa(cfg, 'GET', '/contact?' + q);
+    if (!known.ok || !known.body) {
+      console.error('[WhatsApp] Could not look the number up:', known.status, known.body);
+      return { sent: false, reason: 'could not check earlier messages' };
+    }
+    if (known.body.known) return { sent: false, reason: 'this number has already been messaged' };
+
+    const { firstName, lastName } = splitName(data.name);
+    const email = clean(data.email);
+    const contact = { phone, firstName: firstName || undefined, lastName: lastName || undefined };
+    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) contact.email = email;
+    if (contactId) contact.ghlContactId = contactId;
+
+    const sent = await wa(cfg, 'POST', '/send', {
+      locationId: cfg.locationId,
+      contact,
+      /* They sent the form asking to hear about what they ticked; the
+         form and privacy policy say a WhatsApp message follows. */
+      consent: true,
+      templateId: cfg.templateId,
+      values: {
+        'body.1': firstName || 'there',
+        'body.2': writtenInterests(interestsOf(data))
+      },
+      headerMedia: { link: cfg.videoUrl, filename: 'leonardo-power.mp4' }
+    });
+    if (!sent.ok) {
+      console.error('[WhatsApp] Send refused:', sent.status, sent.body);
+      const code = sent.body && sent.body.code;
+      const why = {
+        opted_out: 'they have opted out of WhatsApp messages',
+        not_on_whatsapp: 'the number is not on WhatsApp'
+      }[code];
+      return { sent: false, reason: why || 'the message could not be sent' + (code ? ' (' + code + ')' : '') };
+    }
+    return { sent: true };
+  } catch (err) {
+    console.error('[WhatsApp] Request error:', err);
+    return { sent: false, reason: 'the message could not be sent' };
+  }
+}
+
 /* The answers that have no standard GHL field go on as a note. A note
    always lands, whereas a custom field silently vanishes if the key
    doesn't exist in the location. */
-function buildNote(data, call) {
+function buildNote(data, call, whatsapp) {
   const stamp = new Date().toLocaleString('en-GB', {
     dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London'
   });
@@ -280,6 +402,11 @@ function buildNote(data, call) {
       lines.push(call.placed
         ? 'The AI assistant rang them straight away.'
         : 'The AI assistant did not ring them: ' + call.reason + '.');
+    }
+    if (whatsapp) {
+      lines.push(whatsapp.sent
+        ? 'Sent the business_show_first_contact WhatsApp message straight away.'
+        : 'No WhatsApp message sent: ' + whatsapp.reason + '.');
     }
   }
 
@@ -341,15 +468,19 @@ module.exports = async (req, res) => {
     const contactId = result.body && result.body.contact && result.body.contact.id;
 
     /* Ring them before the note is written, so the note can say whether
-       the call went out. */
-    const call = data.form === EVENT_FORM
-      ? await placeShowCall(data, phone, contactId)
-      : null;
+       the call went out. The call and the WhatsApp message go out side by side. */
+    let call = null, whatsapp = null;
+    if (data.form === EVENT_FORM) {
+      [call, whatsapp] = await Promise.all([
+        placeShowCall(data, phone, contactId),
+        sendShowWhatsApp(data, phone, contactId)
+      ]);
+    }
 
     if (contactId) {
       const note = await ghl(
         `https://services.leadconnectorhq.com/contacts/${contactId}/notes`,
-        token, { body: buildNote(data, call) });
+        token, { body: buildNote(data, call, whatsapp) });
       /* The lead is safely in GHL. A missing note is an inconvenience
          for whoever picks it up, not a reason to tell the visitor it failed. */
       if (!note.ok) console.error('[GHL] Note failed for', contactId, note.status, note.body);

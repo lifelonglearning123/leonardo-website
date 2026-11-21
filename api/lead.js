@@ -10,18 +10,6 @@
      GHL_LOCATION_ID   the sub-account / location ID
      GHL_TOKEN         Private Integration Token with contacts.write
 
-   Optional, for the Business Show follow-up call (see "THE FOLLOW-UP
-   CALL" below). With any of the first three missing, no call is placed
-   and the form behaves exactly as before:
-     RETELL_API_KEY         Leonardo Power's Retell API key
-     SHOW_CALL_AGENT_ID     the Retell agent that makes the call (agent_…)
-     SHOW_CALL_FROM_NUMBER  the number it rings from, E.164 (+447…)
-     SHOW_CALL_ENABLED      set to "false" to stop the calls without a deploy
-     SHOW_CALL_DAILY_CAP    most calls in any 24 hours (default 60)
-
-   Optional, for the Business Show WhatsApp message (see "THE WHATSAPP
-   MESSAGE" below): WHATSAPP_CONSOLE_URL and WHATSAPP_CONSOLE_SECRET.
-
    Locally, `python -m http.server` cannot run this — use `vercel dev`.
    ------------------------------------------------------------------ */
 
@@ -39,7 +27,6 @@ const NEED_TAGS = {
   'Front desk':                                    'front-desk',
   'Assistant - call requested':                    'assistant-callback',
   'Assistant - question':                          'assistant-question',
-  'Business Show offer':                           'show-offer',
   'Signal':                                        'signal',
   'Google Business Profile':                       'gbp',
   'Nexus':                                         'nexus',
@@ -48,22 +35,6 @@ const NEED_TAGS = {
   'SEO and AEO — get found, get quoted':           'seo-aeo',
   "Not sure yet — let's talk":                     'unsure'
 };
-
-/* The Business Show 2026 pop-up. Each ticked product becomes a tag, so a
-   GHL smart list or workflow can pick up "everyone who wants Signal"
-   without anyone opening the notes. Only these keys are accepted. */
-const EVENT_FORM   = 'business-show-2026';
-const EVENT_SOURCE = 'leonardopower.com — Business Show 2026 pop-up';
-const PRODUCTS = {
-  gbp:    { tag: 'interest-gbp',    label: 'Google Business Profile' },
-  signal: { tag: 'interest-signal', label: 'Signal (AI voice)' },
-  nexus:  { tag: 'interest-nexus',  label: 'Nexus (CRM)' }
-};
-
-function interestsOf(data) {
-  const raw = Array.isArray(data.interests) ? data.interests : [];
-  return Object.keys(PRODUCTS).filter(k => raw.includes(k));
-}
 
 function clean(value) {
   if (typeof value !== 'string') return '';
@@ -91,18 +62,13 @@ function splitName(full) {
 function buildPayload(data, locationId) {
   const { firstName, lastName } = splitName(data.name);
   const need = clean(data.need);
-  const isEvent = data.form === EVENT_FORM;
-
-  let tags = ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : []);
-  if (isEvent) {
-    tags = tags.concat(EVENT_FORM, interestsOf(data).map(k => PRODUCTS[k].tag));
-  }
+  const tags = ['website-lead'].concat(NEED_TAGS[need] ? [NEED_TAGS[need]] : []);
 
   const payload = {
     locationId,
     firstName,
     lastName,
-    source:  isEvent ? EVENT_SOURCE : SOURCE,
+    source:  SOURCE,
     country: COUNTRY,
     tags
   };
@@ -138,277 +104,14 @@ async function ghl(url, token, body) {
   return { ok: res.ok, status: res.status, body: parsed };
 }
 
-/* ------------------------------------------------------------------
-   THE FOLLOW-UP CALL
-
-   Someone who sends the Business Show form is rung straight away by
-   Leonardo Power's own AI assistant, which knows their first name and
-   what they ticked. The call is the demonstration.
-
-   The agent's script is agent/show-call-prompt.md. It lives in Retell;
-   that file is the copy to edit and re-send.
-
-   Anyone can type any number into a web form, so before ringing:
-     - UK landlines and mobiles only (no premium, personal or pager ranges)
-     - 08:00 to 21:00 UK time only
-     - a number is rung once (Retell's call list, 60 days back)
-     - no more than SHOW_CALL_DAILY_CAP calls in any 24 hours
-   Retell's own call list is the record for the last two, so there is no
-   database here. If that list can't be read, nobody is rung.
-
-   A call that isn't placed never fails the form: the lead is already
-   saved, and the team follows up as they always did.
-   ------------------------------------------------------------------ */
-const RETELL_BASE    = 'https://api.retellai.com';
-const RETELL_TIMEOUT = 6000;
-const CALL_DAILY_CAP = 60;
-const DAY_MS         = 24 * 60 * 60 * 1000;
-const ONCE_WINDOW_MS = 60 * DAY_MS;
-
-/* 01, 02, 03 and real mobiles. Not 070 (personal numbers), 076 (pagers),
-   08 or 09. */
-const UK_CALLABLE = /^\+44(?:1\d{8,9}|2\d{9}|3\d{9}|7[1-57-9]\d{8})$/;
-
-function showCallConfig() {
-  const apiKey     = (process.env.RETELL_API_KEY || '').trim();
-  const agentId    = (process.env.SHOW_CALL_AGENT_ID || '').trim();
-  const fromNumber = (process.env.SHOW_CALL_FROM_NUMBER || '').trim();
-  if (!apiKey || !agentId || !/^\+\d{8,15}$/.test(fromNumber)) return null;
-  if ((process.env.SHOW_CALL_ENABLED || '').trim().toLowerCase() === 'false') return null;
-  const cap = Number((process.env.SHOW_CALL_DAILY_CAP || '').trim());
-  return {
-    apiKey, agentId, fromNumber,
-    dailyCap: Number.isFinite(cap) && cap > 0 ? Math.floor(cap) : CALL_DAILY_CAP
-  };
-}
-
-function londonHour(now) {
-  return Number(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/London', hour: 'numeric', hour12: false
-  }).format(now)) % 24;
-}
-
-/* "Signal", "Signal and Nexus", or all three by name: read aloud by the
-   agent, so written the way a person would say it. */
-function spokenInterests(keys) {
-  const names = { gbp: 'Google Business Profile', signal: 'Signal', nexus: 'Nexus' };
-  const picked = ['signal', 'nexus', 'gbp'].filter(k => keys.includes(k)).map(k => names[k]);
-  if (picked.length === 3) return 'all three: Signal, Nexus and Google Business Profile';
-  if (picked.length === 2) return picked[0] + ' and ' + picked[1];
-  return picked[0] || 'what Leonardo Power does';
-}
-
-async function retell(path, apiKey, body) {
-  const res = await fetch(RETELL_BASE + path, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(RETELL_TIMEOUT)
-  });
-  let parsed = null;
-  try { parsed = await res.json(); } catch (_) { /* empty or non-JSON */ }
-  return { ok: res.ok, status: res.status, body: parsed };
-}
-
-/* Returns { placed: true } or { placed: false, reason } — the reason goes
-   on the contact's note and in the log, never to the browser. */
-async function placeShowCall(data, phone, contactId, now = new Date()) {
-  const cfg = showCallConfig();
-  if (!cfg) return { placed: false, reason: 'calls are switched off' };
-  if (!UK_CALLABLE.test(phone)) return { placed: false, reason: 'not a UK landline or mobile' };
-  const hour = londonHour(now);
-  if (hour < 8 || hour >= 21) return { placed: false, reason: 'outside 08:00 to 21:00' };
-
-  try {
-    /* Retell's v3 list: typed filters, and the calls come back in `items`.
-       One page is 1,000 calls, far more than the show will make. */
-    const recent = await retell('/v3/list-calls', cfg.apiKey, {
-      filter_criteria: {
-        agent_id: [cfg.agentId],
-        start_timestamp: { type: 'number', op: 'ge', value: now.getTime() - ONCE_WINDOW_MS }
-      },
-      sort_order: 'descending',
-      limit: 1000
-    });
-    const calls = recent.body && recent.body.items;
-    if (!recent.ok || !Array.isArray(calls)) {
-      console.error('[Call] Could not read recent calls:', recent.status, recent.body);
-      return { placed: false, reason: 'could not check earlier calls' };
-    }
-    if (calls.some(c => c && c.to_number === phone)) {
-      return { placed: false, reason: 'this number has already been rung' };
-    }
-    const dayAgo = now.getTime() - DAY_MS;
-    const today = calls.filter(c => c && Number(c.start_timestamp) >= dayAgo).length;
-    if (today >= cfg.dailyCap) {
-      console.error('[Call] Daily cap reached:', today);
-      return { placed: false, reason: 'the daily limit of calls was reached' };
-    }
-
-    const call = await retell('/v2/create-phone-call', cfg.apiKey, {
-      from_number: cfg.fromNumber,
-      to_number: phone,
-      override_agent_id: cfg.agentId,
-      metadata: { source: EVENT_FORM, ghl_contact_id: contactId || '' },
-      retell_llm_dynamic_variables: {
-        first_name: splitName(data.name).firstName || 'there',
-        interests: spokenInterests(interestsOf(data))
-      }
-    });
-    if (!call.ok || !call.body || !call.body.call_id) {
-      console.error('[Call] Retell would not place the call:', call.status, call.body);
-      return { placed: false, reason: 'the call could not be started' };
-    }
-    return { placed: true };
-  } catch (err) {
-    console.error('[Call] Request error:', err);
-    return { placed: false, reason: 'the call could not be started' };
-  }
-}
-
-/* ------------------------------------------------------------------
-   THE WHATSAPP MESSAGE
-
-   Someone who sends the Business Show form also gets the approved
-   template `business_show_first_contact` on WhatsApp, straight away,
-   from the "Leonardo whatsapp" client in the WhatsApp console
-   (c:\Python\whatsapp), through its partner API:
-     GET  /api/partner/nexus/contact   have we written to them before?
-     POST /api/partner/nexus/send      the template, with the video header
-
-   The template: a video, then "Hi {{1}} … That's {{2}} — not a demo".
-   {{1}} is the first name, {{2}} what they ticked.
-
-   Each number is messaged once: if the console already knows them, it
-   is skipped. Opt-outs and numbers not on WhatsApp are refused by the
-   console itself. As with the call, a message that isn't sent never
-   fails the form.
-
-   Env vars (without the first two, nothing is sent):
-     WHATSAPP_CONSOLE_URL     the console's address, no trailing slash
-     WHATSAPP_CONSOLE_SECRET  its NEXUS_PARTNER_SECRET
-     SHOW_WHATSAPP_ENABLED    "false" stops the messages without a deploy
-     SHOW_WHATSAPP_LOCATION_ID / _TEMPLATE_ID / _VIDEO_URL  override the
-                              defaults below
-   ------------------------------------------------------------------ */
-const WA_TIMEOUT = 8000;
-const WA_DEFAULTS = {
-  locationId: 'glJLLR7g7r7guHRWEilj',                   // "Leonardo whatsapp"
-  templateId: 'eefa96ca-0192-4aca-8452-c3ceb9a3dee7',   // business_show_first_contact
-  videoUrl:   'https://gqmeqeobbetvsdbq.public.blob.vercel-storage.com/clients/dbbc239d-19b6-44a6-9b12-59e22b0cb78a/leonardo-bold-1080p_squished-mNichc6rB2Y3OYnbsDFZ5vJkKrOPJO.mp4'
-};
-
-function showWhatsAppConfig() {
-  const base   = (process.env.WHATSAPP_CONSOLE_URL || '').trim().replace(/\/+$/, '');
-  const secret = (process.env.WHATSAPP_CONSOLE_SECRET || '').trim();
-  if (!/^https:\/\//.test(base) || !secret) return null;
-  if ((process.env.SHOW_WHATSAPP_ENABLED || '').trim().toLowerCase() === 'false') return null;
-  const env = k => (process.env[k] || '').trim();
-  return {
-    base, secret,
-    locationId: env('SHOW_WHATSAPP_LOCATION_ID') || WA_DEFAULTS.locationId,
-    templateId: env('SHOW_WHATSAPP_TEMPLATE_ID') || WA_DEFAULTS.templateId,
-    videoUrl:   env('SHOW_WHATSAPP_VIDEO_URL')   || WA_DEFAULTS.videoUrl
-  };
-}
-
-/* "Signal", "Signal and Nexus", "Signal, Nexus and Google Business
-   Profile": read in "That's {{2}} — not a demo". */
-function writtenInterests(keys) {
-  const names = { gbp: 'Google Business Profile', signal: 'Signal', nexus: 'Nexus' };
-  const picked = ['signal', 'nexus', 'gbp'].filter(k => keys.includes(k)).map(k => names[k]);
-  if (!picked.length) return 'Leonardo Power';
-  if (picked.length === 1) return picked[0];
-  return picked.slice(0, -1).join(', ') + ' and ' + picked[picked.length - 1];
-}
-
-async function wa(cfg, method, path, body) {
-  const res = await fetch(cfg.base + '/api/partner/nexus' + path, {
-    method,
-    headers: { 'Authorization': `Bearer ${cfg.secret}`, 'Content-Type': 'application/json' },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(WA_TIMEOUT)
-  });
-  let parsed = null;
-  try { parsed = await res.json(); } catch (_) { /* empty or non-JSON */ }
-  return { ok: res.ok, status: res.status, body: parsed };
-}
-
-/* Returns { sent: true } or { sent: false, reason } — for the note and
-   the log, never the browser. */
-async function sendShowWhatsApp(data, phone, contactId) {
-  const cfg = showWhatsAppConfig();
-  if (!cfg) return { sent: false, reason: 'WhatsApp messages are switched off' };
-  if (!/^\+\d{10,15}$/.test(phone)) return { sent: false, reason: 'no usable phone number' };
-
-  try {
-    const q = new URLSearchParams({ locationId: cfg.locationId, phone });
-    const known = await wa(cfg, 'GET', '/contact?' + q);
-    if (!known.ok || !known.body) {
-      console.error('[WhatsApp] Could not look the number up:', known.status, known.body);
-      return { sent: false, reason: 'could not check earlier messages' };
-    }
-    if (known.body.known) return { sent: false, reason: 'this number has already been messaged' };
-
-    const { firstName, lastName } = splitName(data.name);
-    const email = clean(data.email);
-    const contact = { phone, firstName: firstName || undefined, lastName: lastName || undefined };
-    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) contact.email = email;
-    if (contactId) contact.ghlContactId = contactId;
-
-    const sent = await wa(cfg, 'POST', '/send', {
-      locationId: cfg.locationId,
-      contact,
-      /* They sent the form asking to hear about what they ticked; the
-         form and privacy policy say a WhatsApp message follows. */
-      consent: true,
-      templateId: cfg.templateId,
-      values: {
-        'body.1': firstName || 'there',
-        'body.2': writtenInterests(interestsOf(data))
-      },
-      headerMedia: { link: cfg.videoUrl, filename: 'leonardo-power.mp4' }
-    });
-    if (!sent.ok) {
-      console.error('[WhatsApp] Send refused:', sent.status, sent.body);
-      const code = sent.body && sent.body.code;
-      const why = {
-        opted_out: 'they have opted out of WhatsApp messages',
-        not_on_whatsapp: 'the number is not on WhatsApp'
-      }[code];
-      return { sent: false, reason: why || 'the message could not be sent' + (code ? ' (' + code + ')' : '') };
-    }
-    return { sent: true };
-  } catch (err) {
-    console.error('[WhatsApp] Request error:', err);
-    return { sent: false, reason: 'the message could not be sent' };
-  }
-}
-
 /* The answers that have no standard GHL field go on as a note. A note
    always lands, whereas a custom field silently vanishes if the key
    doesn't exist in the location. */
-function buildNote(data, call, whatsapp) {
+function buildNote(data) {
   const stamp = new Date().toLocaleString('en-GB', {
     dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London'
   });
-  const isEvent = data.form === EVENT_FORM;
-  const lines = [(isEvent ? 'Business Show 2026 pop-up — ' : 'Website lead — ') + stamp, ''];
-
-  if (isEvent) {
-    const picked = interestsOf(data).map(k => PRODUCTS[k].label);
-    lines.push('Interested in: ' + (picked.length ? picked.join(', ') : 'nothing ticked'));
-    if (call) {
-      lines.push(call.placed
-        ? 'The AI assistant rang them straight away.'
-        : 'The AI assistant did not ring them: ' + call.reason + '.');
-    }
-    if (whatsapp) {
-      lines.push(whatsapp.sent
-        ? 'Sent the business_show_first_contact WhatsApp message straight away.'
-        : 'No WhatsApp message sent: ' + whatsapp.reason + '.');
-    }
-  }
+  const lines = ['Website lead — ' + stamp, ''];
 
   const business = clean(data.business);
   const need     = clean(data.need);
@@ -467,20 +170,10 @@ module.exports = async (req, res) => {
 
     const contactId = result.body && result.body.contact && result.body.contact.id;
 
-    /* Ring them before the note is written, so the note can say whether
-       the call went out. The call and the WhatsApp message go out side by side. */
-    let call = null, whatsapp = null;
-    if (data.form === EVENT_FORM) {
-      [call, whatsapp] = await Promise.all([
-        placeShowCall(data, phone, contactId),
-        sendShowWhatsApp(data, phone, contactId)
-      ]);
-    }
-
     if (contactId) {
       const note = await ghl(
         `https://services.leadconnectorhq.com/contacts/${contactId}/notes`,
-        token, { body: buildNote(data, call, whatsapp) });
+        token, { body: buildNote(data) });
       /* The lead is safely in GHL. A missing note is an inconvenience
          for whoever picks it up, not a reason to tell the visitor it failed. */
       if (!note.ok) console.error('[GHL] Note failed for', contactId, note.status, note.body);
@@ -488,7 +181,7 @@ module.exports = async (req, res) => {
       console.error('[GHL] Upsert returned no contact id; note skipped');
     }
 
-    return res.status(200).json({ ok: true, calling: !!(call && call.placed) });
+    return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[GHL] Request error:', err);
     return res.status(502).json({ error: 'We could not save that. Please email hello@leonardopower.com.' });

@@ -11,7 +11,8 @@
      plan=signal     £100 / month   Signal, AI voice
      plan=gbp        £50 / month    Google Business Profile
      plan=nexus      £100 / month   Nexus CRM
-     plan=show       £99 / month    Business Show 2026 bundle (the default)
+
+   Any other plan (or none) goes back to the pricing section.
 
    The "Who are we building for?" step saves the lead to GHL first,
    then arrives here with ?email=… so Stripe has it filled in.
@@ -19,11 +20,10 @@
    Env vars (Vercel → Project → Settings → Environment Variables,
    or .env for `vercel dev`):
      STRIPE_SECRET_KEY      required — sk_live_… / rk_live_… (sk_test_… while testing)
-     STRIPE_SHOW_PRICE_ID   optional — overrides the show bundle price below
      STRIPE_VAT_RATE_ID     optional — overrides the 20% VAT rate below
 
    Until the key is set, or if Stripe fails, visitors are sent back to
-   the site (the show pop-up, or the contact section) so the button
+   the site (the contact section) so the button
    never dead-ends. The lead was already saved by then.
    ------------------------------------------------------------------ */
 
@@ -39,9 +39,7 @@ const PLANS = {
   frontdesk: { prices: ['price_1UaO3fBdqYbaDfVsdOXr5d4q'] },  /* £299 a month */
   signal:    { prices: ['price_1UaO3xBdqYbaDfVssU4od94u'] },  /* £100 a month */
   gbp:       { prices: ['price_1UaO3dBdqYbaDfVsUnFhlYGx'] },  /* £50 a month */
-  nexus:     { prices: ['price_1UaO3dBdqYbaDfVsRi4DYBn9'] },  /* £100 a month */
-  show:      { prices: [process.env.STRIPE_SHOW_PRICE_ID || 'price_1UaMfmBdqYbaDfVseJCpyw3O'],  /* £99 a month */
-               offer: 'business-show-2026', fallback: '/?bs26' }
+  nexus:     { prices: ['price_1UaO3dBdqYbaDfVsRi4DYBn9'] }   /* £100 a month */
 };
 
 function siteOrigin(req) {
@@ -64,10 +62,11 @@ module.exports = async (req, res) => {
   }
 
   const q      = req.query || {};
-  const name   = Object.prototype.hasOwnProperty.call(PLANS, q.plan) ? q.plan : 'show';
-  const plan   = PLANS[name];
   const origin = siteOrigin(req);
-  const back   = origin + (plan.fallback || '/#contact');
+  if (!Object.prototype.hasOwnProperty.call(PLANS, q.plan)) return redirect(res, origin + '/#pricing');
+  const name   = q.plan;
+  const plan   = PLANS[name];
+  const back   = origin + '/#contact';
   const key    = process.env.STRIPE_SECRET_KEY;
   const vat    = process.env.STRIPE_VAT_RATE_ID || UK_VAT;
 
@@ -91,10 +90,6 @@ module.exports = async (req, res) => {
     form.set(`line_items[${i}][quantity]`, '1');
     form.set(`line_items[${i}][tax_rates][0]`, vat);
   });
-  if (plan.offer) {
-    form.set('metadata[offer]', plan.offer);
-    form.set('subscription_data[metadata][offer]', plan.offer);
-  }
   if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) form.set('customer_email', email);
 
   try {
